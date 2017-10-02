@@ -1,7 +1,6 @@
 {
   "name": "react-web-services",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,5 +11,16 @@
   "dependencies": {
     "express": "^4.16.1",
     "mongoose": "^4.11.14"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BrianJenney/react-web-services.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/BrianJenney/react-web-services/issues"
+  },
+  "homepage": "https://github.com/BrianJenney/react-web-services#readme",
+  "description": ""
 }
