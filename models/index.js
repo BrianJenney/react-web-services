@@ -1,4 +1,8 @@
 module.exports = {
     User: require("./user"),
-    Pics: require("./pics")
+    Pics: require("./pics"),
+    Message: require("./messages.js")
   };
+
+
+  
