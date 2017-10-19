@@ -7,26 +7,21 @@ var Schema = mongoose.Schema;
 var MessagesSchema = new Schema({
 
   //id of pic associated with this convo
-  id: {
-    type: String
-  },
-
-  //array of messages
-  messages: [
-    {
-        user:{
-            type: String,
-            trim: true
-        },
-        text: {
-            type: String
-        },
-        time: {
-            type: Date,
-            default: Date.now()
-        }
+    id: {
+        type: String
+    },
+    user:{
+        type: String,
+        trim: true
+    },
+    text: {
+        type: String
+    },
+    time: {
+        type: Date,
+        default: Date.now()
     }
-  ]
+    
 });
 
 // Create the "User" model with our UserSchema schema

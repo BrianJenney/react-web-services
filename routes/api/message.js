@@ -3,7 +3,7 @@
 const router = require("express").Router();
 const messageController = require("../../controllers/messageController");
 
-router.route("/post")
+router.route("/postmessage")
   .post(messageController.post);
 
 router.route("/getmessage")
