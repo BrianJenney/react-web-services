@@ -1,7 +1,7 @@
 module.exports = {
     User: require("./user"),
     Pics: require("./pics"),
-    Message: require("./messages.js")
+    Messages: require("./messages.js")
   };
 
 
