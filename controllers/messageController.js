@@ -12,7 +12,8 @@ module.exports = {
 
     //get messages based on pic id
     getMessages: function(req,res){
-      db.Messages.find({})
+
+      find({id : req.body.id})
       .then(doc=> res.json(doc))
       .catch(doc=>res.json(err));
     }
