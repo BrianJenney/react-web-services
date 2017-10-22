@@ -14,6 +14,10 @@ var MessagesSchema = new Schema({
         type: String,
         trim: true
     },
+    recipient:{
+        type: String,
+        trim: true
+    },
     text: {
         type: String
     },

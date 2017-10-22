@@ -10,7 +10,10 @@ var PicsSchema = new Schema({
   userid: {
     type: String
   },
-
+  userEmail:{
+    type: String,
+    trim: true
+  },
   //url of pic
   imgUrl: {
     type: String,
