@@ -32,7 +32,7 @@ module.exports = {
     getConvoFromListing: function(req, res){
       db.Messages.find({id: req.query.picId, 
       $or: [{recipient: req.query.recipient}, {user: req.query.recipient}]
-     }).sort({time: -1 })
+     }).sort({time: 1 })
      .then(doc=>res.json(doc))
      .catch(doc=>res.json(doc));
     }

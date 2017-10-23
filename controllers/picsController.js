@@ -8,8 +8,8 @@ module.exports = {
     },
 
     getListings: function(req,res){
-      db.Pics.find({})
-      .then(doc=> res.json(doc))
+      db.Pics.find({'userid': {$ne: req.query.picid} })
+      .then(doc=> res.json(doc)) 
       .catch(doc=>res.json(err));
     }
   };
