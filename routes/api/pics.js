@@ -8,4 +8,7 @@ router.route("/upload")
 router.route("/getlistings")
   .get(picsController.getListings);
 
+router.route("/getlistingsbyuser")
+  .get(picsController.getListingsByUser);
+
 module.exports = router;

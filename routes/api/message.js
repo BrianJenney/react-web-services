@@ -9,11 +9,14 @@ router.route("/postmessage")
 router.route("/getmessage")
   .get(messageController.getMessages);
 
-  router.route("/getmessagesbyuser")
+router.route("/getmessagesbyuser")
   .get(messageController.getMessagesByUser);
 
-  router.route("/getconvofromlisting")
+router.route("/getconvofromlisting")
   .get(messageController.getConvoFromListing);
+
+router.route("/getusersbypic")
+  .get(messageController.getUsersByPic);
 
 
 module.exports = router;

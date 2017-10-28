@@ -24,9 +24,11 @@ module.exports = {
     //get number of users commenting on a specific pic
     getUsersByPic: function(req, res){
       db.Messages.aggregate(
-          {"$match":{id: "59cefe8280e6e509ec3928c7"}}, 
+          {"$match":{id: req.query.id}}, 
           {"$group":{"_id":"$user", text: {$push: '$text'} }} 
         )
+        .then(doc=>res.json(doc))
+        .catch(doc=>res.json(err));
     },
     //get convo between users about a pic - from listings
     getConvoFromListing: function(req, res){

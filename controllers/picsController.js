@@ -11,5 +11,11 @@ module.exports = {
       db.Pics.find({'userid': {$ne: req.query.picid} })
       .then(doc=> res.json(doc)) 
       .catch(doc=>res.json(err));
+    },
+
+    getListingsByUser: function(req, res){
+      db.Pics.find({'userEmail': req.query.email})
+      .then(doc=>res.json(doc))
+      .catch(doc=>res.json(err));
     }
   };
