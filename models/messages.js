@@ -1,10 +1,9 @@
-// Dependency
-var mongoose = require("mongoose");
 
-// Create the Schema class
-var Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
-var MessagesSchema = new Schema({
+const Schema = mongoose.Schema;
+
+const MessagesSchema = new Schema({
     id: String,
     from: String,
     to: String,
@@ -15,8 +14,6 @@ var MessagesSchema = new Schema({
     }
 });
 
-// Create the "User" model with our UserSchema schema
-var Messages = mongoose.model("Messages", MessagesSchema);
+const Messages = mongoose.model("Messages", MessagesSchema);
 
-// Export the User model, so it can be used in server.js with a require
 module.exports = Messages;

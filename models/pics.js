@@ -1,10 +1,10 @@
 // Dependency
-var mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 // Create the Schema class
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-var PicsSchema = new Schema({
+const PicsSchema = new Schema({
 
   //id of user who posted
   userid: {
@@ -33,8 +33,6 @@ var PicsSchema = new Schema({
   }
 });
 
-// Create the "User" model with our UserSchema schema
-var Pics = mongoose.model("Pics", PicsSchema);
+const Pics = mongoose.model("Pics", PicsSchema);
 
-// Export the User model, so it can be used in server.js with a require
 module.exports = Pics;
