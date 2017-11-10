@@ -3,12 +3,26 @@
 const db = require("../models");
 
 module.exports = {
-    //post message to pic based on pic id
+    //upsert conversation
     post: function(req, res) {
-      db.Messages.create(req.body)
-      .then(doc => res.json(doc))
-      .catch(err => res.json(err));
+    console.log(req);
+    db.Messages.update(
+      { id: 1},
+      {
+         $set: { participants: ["bob","jane"] },
+         $push: { messages: {
+             from: 'me',
+             to: 'you',
+             text: 'this is some text'
+             } 
+         }
+      },
+      { upsert: true }
+    )
+    .then(doc=> res.json(doc))
+    .catch(doc=>res.json(err));
     },
+
     //get messages based on pic id
     getMessages: function(req,res){
       db.Messages.aggregate({id : req.query.id, user: '$user'})
