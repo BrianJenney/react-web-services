@@ -27,6 +27,13 @@ module.exports = {
       db.Messages.find({participants: req.params.email})
       .then(doc => res.json(doc))
       .catch(err => res.json(err));
-    }
+    },
 
+    //get a convo based on two users
+    getConvo: function(req, res){
+      db.Messages.find({participants:{$all: [req.params.recipient, req.params.sender]}})
+      .then(doc => res.json(doc))
+      .catch(err => res.json(err));
+    }
+    
   };
