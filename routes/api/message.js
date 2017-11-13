@@ -4,19 +4,10 @@ const router = require("express").Router();
 const messageController = require("../../controllers/messageController");
 
 router.route("/postmessage")
-  .get(messageController.post);
+  .post(messageController.post);
 
-router.route("/getmessage")
+router.route("/getmessages/:email")
   .get(messageController.getMessages);
-
-router.route("/getmessagesbyuser")
-  .get(messageController.getMessagesByUser);
-
-router.route("/getconvofromlisting")
-  .get(messageController.getConvoFromListing);
-
-router.route("/getusersbypic")
-  .get(messageController.getUsersByPic);
 
 
 module.exports = router;

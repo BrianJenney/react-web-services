@@ -2,7 +2,7 @@ const db = require("../models");
 
 module.exports = {
   login: function(req, res) { //is user in DB ? verify : add new user
-    db.User.find({email : req.body.email}).then((doc)=>{
+    db.User.find({email : req.body.email, password: req.body.password}).then((doc)=>{
       res.json(doc);
     })
   },

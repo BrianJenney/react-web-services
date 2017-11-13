@@ -5,10 +5,10 @@ const picsController = require("../../controllers/picsController");
 router.route("/upload")
   .post(picsController.upload);
 
-router.route("/getlistings")
+router.route("/getlistings/:userid")
   .get(picsController.getListings);
 
-router.route("/getlistingsbyuser")
+router.route("/getlistingsbyuser/:email")
   .get(picsController.getListingsByUser);
 
 module.exports = router;

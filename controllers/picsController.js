@@ -8,13 +8,13 @@ module.exports = {
     },
 
     getListings: function(req,res){
-      db.Pics.find({'userid': {$ne: req.query.picid} })
+      db.Pics.find({'userid': {$ne: req.params.userid} })
       .then(doc=> res.json(doc)) 
       .catch(doc=>res.json(err));
     },
 
     getListingsByUser: function(req, res){
-      db.Pics.find({'userEmail': req.query.email})
+      db.Pics.find({'userEmail': req.params.email})
       .then(doc=>res.json(doc))
       .catch(doc=>res.json(err));
     }
