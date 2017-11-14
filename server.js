@@ -4,7 +4,13 @@ const bodyParser = require("body-parser");
 const routes = require("./routes");
 const mongo = require('mongodb');
 const mongoose = require("mongoose");
-const uri = 'mongodb://brianjenney:freestyl1@ds115701.mlab.com:15701/react';
+
+const keys = require('./config.js');
+
+console.log(keys);
+
+const uri = keys.mongo;
+
 
 mongoose.connect(uri);
 
