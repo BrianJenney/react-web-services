@@ -4,15 +4,17 @@ const bodyParser = require("body-parser");
 const routes = require("./routes");
 const mongo = require('mongodb');
 const mongoose = require("mongoose");
-
+const cloudinary = require('cloudinary');
 const keys = require('./config.js');
-
-console.log(keys);
-
 const uri = keys.mongo;
 
-
 mongoose.connect(uri);
+
+cloudinary.config({
+  cloud_name: '',
+  api_key: '',
+  api_secret: ''
+})
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
