@@ -5,7 +5,9 @@ const routes = require("./routes");
 const mongo = require('mongodb');
 const mongoose = require("mongoose");
 const keys = require('./config.js');
-const uri = keys.mongo;
+const uri = process.env.NODE_ENV ? process.env.mongo : keys.mongo;
+
+console.log(process.env.NODE_ENV);
 
 mongoose.connect(uri);
 
