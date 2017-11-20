@@ -4,10 +4,7 @@ const bodyParser = require("body-parser");
 const routes = require("./routes");
 const mongo = require('mongodb');
 const mongoose = require("mongoose");
-// const keys = require('./config.js');
 const uri = process.env.NODE_ENV ? process.env.mongo : require('./config.js').mongo;
-
-console.log(process.env.NODE_ENV);
 
 mongoose.connect(uri);
 
