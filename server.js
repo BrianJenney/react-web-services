@@ -6,7 +6,7 @@ const mongo = require('mongodb');
 const mongoose = require("mongoose");
 const uri = process.env.NODE_ENV ? process.env.mongo : require('./config.js').mongo;
 
-mongoose.connect(uri);
+mongoose.connect('mongodb://brianjenney:freestyl1@ds115701.mlab.com:15701/react');
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
