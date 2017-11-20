@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const routes = require("./routes");
 const mongo = require('mongodb');
 const mongoose = require("mongoose");
-const cloudinary = require('cloudinary');
 const keys = require('./config.js');
 const uri = keys.mongo;
 
