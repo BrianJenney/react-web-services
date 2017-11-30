@@ -20,6 +20,7 @@ module.exports = {
               return
             }
 
+            res.setHeader('Content-Type', 'application/json');
             res.send(JSON.parse(JSON.stringify(body)));
           })
     }
