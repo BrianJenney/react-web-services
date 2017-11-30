@@ -46,12 +46,12 @@ const UserSchema = new Schema({
 
 // hash the password
 UserSchema.methods.generateHash = function(password) {
-  return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(16), null);
 };
 
 // checking if password is valid
 UserSchema.methods.validPassword = function(password) {
-  return bcrypt.compareSync(password, this.password);
+  return bcrypt.compareSync(password, this.password);  
 };
 
 const User = mongoose.model("User", UserSchema);

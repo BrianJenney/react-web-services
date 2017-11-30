@@ -1,17 +1,18 @@
 const db = require('../models');
 
 module.exports = {
-  login: function(req, res) { //is user in DB ? verify : add new user
+  login: function(req, res) {
     db.User.findOne({email : req.body.email})
       .then((user)=>{
-        console.log(user);
+
       if(user !== null){
-        console.log(user.validPassword(req.body.password));
         if(user.validPassword(req.body.password)){
           res.json(user);
         }else{
           res.json({errors: 'invalid password', message: 'Password or Username not found'})
         }      
+      }else{
+        res.json({errors: 'invalid password', message: 'Password or Username not found'})
       }
     })
   },
