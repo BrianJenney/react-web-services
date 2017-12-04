@@ -5,6 +5,7 @@ const routes = require("./routes");
 const mongo = require('mongodb');
 const mongoose = require("mongoose");
 const uri = process.env.NODE_ENV ? process.env.mongo : require('./config.js').mongo;
+const jwt = require('jsonwebtoken');
 
 mongoose.connect(uri);
 

@@ -1,4 +1,5 @@
 const db = require('../models');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
   login: function(req, res) {
@@ -7,7 +8,8 @@ module.exports = {
 
       if(user !== null){
         if(user.validPassword(req.body.password)){
-          res.json(user);
+          let token = jwt.sign({ email: user.email, password: user.password, _id: user._id})
+          res.json({user: user, token: token});
         }else{
           res.json({errors: 'invalid password', message: 'Password or Username not found'})
         }      
