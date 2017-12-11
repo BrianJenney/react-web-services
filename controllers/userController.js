@@ -13,14 +13,27 @@ module.exports = {
             data: { email: user.email, password: user.password, _id: user._id}
           }, 'secret', { expiresIn: '1h' });
 
-          console.log(token);
-          res.json({user: user, token: token});
+          const user = {
+            email: user.email,
+            userType: user.userType,
+            _id: user._id
+          }
+
+          res.json({user, token: token});
         }else{
           res.json({errors: 'invalid password', message: 'Password or Username not found'})
         }      
       }else{
         res.json({errors: 'invalid password', message: 'Password or Username not found'})
       }
+    })
+  },
+
+  //FOR TESTING ONLY - USE TO TEST AUTHENTICATE ROUTES
+  authenticate: function(req, res){
+    console.log(req.params);
+    jwt.verify(req.params.token, 'secret', (err, token)=>{
+      console.log(token);
     })
   },
 
