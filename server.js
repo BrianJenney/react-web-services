@@ -1,13 +1,16 @@
 const express = require('express')
 const app = express();
-const bodyParser = require("body-parser");
-const routes = require("./routes");
+const bodyParser = require('body-parser');
+const routes = require('./routes');
 const mongo = require('mongodb');
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const uri = process.env.NODE_ENV ? process.env.mongo : require('./config.js').mongo;
 const jwt = require('jsonwebtoken');
+const cors = require('cors')
 
 mongoose.connect(uri);
+
+app.use(cors());
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");

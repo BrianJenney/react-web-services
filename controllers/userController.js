@@ -8,18 +8,19 @@ module.exports = {
 
       if(user !== null){
         if(user.validPassword(req.body.password)){
+          console.log('valid');
 
           let token = jwt.sign({
             data: { email: user.email, password: user.password, _id: user._id}
           }, 'secret', { expiresIn: '1h' });
 
-          const user = {
+          const userInfo = {
             email: user.email,
             userType: user.userType,
             _id: user._id
           }
 
-          res.json({user, token: token});
+          res.json({userInfo, token: token});
         }else{
           res.json({errors: 'invalid password', message: 'Password or Username not found'})
         }      
