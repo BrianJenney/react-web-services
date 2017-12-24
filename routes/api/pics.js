@@ -3,12 +3,12 @@ const router = require("express").Router();
 const picsController = require("../../controllers/picsController");
 
 router.route("/upload")
-  .post(verify, picsController.upload);
+  .post(picsController.upload);
 
 router.route("/getlistings/:userid")
-  .get(verify, picsController.getListings);
+  .get(picsController.getListings);
 
 router.route("/getlistingsbyuser/:email")
-  .get(verify, picsController.getListingsByUser);
+  .get(picsController.getListingsByUser);
 
 module.exports = router;

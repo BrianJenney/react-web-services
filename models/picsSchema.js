@@ -10,27 +10,42 @@ const PicsSchema = new Schema({
   userid: {
     type: String
   },
-  userEmail:{
+  propertyType:{
+    type: String
+  },
+  imgUrl: [{
     type: String,
     trim: true
-  },
-  //url of pic
-  imgUrl: {
-    type: String,
-    trim: true
-  },
-
-  zip:{
+  }],
+  zipCode:{
     type: Number
   },
-
+  city: {
+    type: String
+  },
+  state:{
+    type: String
+  },
+  address:{
+    type: String
+  },
   price: {
     type: Number
   },
-
-  city: {
-    type: String
-  }
+  sqFeet:{
+    type: Number
+  },
+  bedRooms:{
+    type: Number
+  },
+  bathRooms:{
+    type: Number
+  },
+  amenities:[
+    {
+      type: String
+    }
+  ]
 });
 
 const Pics = mongoose.model("Pics", PicsSchema);
