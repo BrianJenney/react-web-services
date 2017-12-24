@@ -7,11 +7,10 @@ const mongoose = require('mongoose');
 const uri = process.env.NODE_ENV ? process.env.mongo : require('./config.js').mongo;
 const jwt = require('jsonwebtoken');
 const cors = require('cors')
-const port = process.env.PORT || 8081
 
 mongoose.connect(uri);
 
-// app.use(cors());
+app.use(cors());
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -25,9 +24,7 @@ app.use(function(req, res, next) {
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.listen(port);
+app.listen(process.env.PORT || 8081);
 
 //ROUTES
-app.use(routes, ()=>{
-  console.log(`app listening on port ${port}`)
-});
+app.use(routes);
