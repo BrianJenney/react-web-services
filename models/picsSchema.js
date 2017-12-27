@@ -1,5 +1,6 @@
 // Dependency
 const mongoose = require("mongoose");
+const moment = require("moment");
 
 // Create the Schema class
 const Schema = mongoose.Schema;
@@ -11,6 +12,9 @@ const PicsSchema = new Schema({
     type: String
   },
   propertyType:{
+    type: String
+  },
+  description: {
     type: String
   },
   imgUrl: [{
@@ -41,11 +45,26 @@ const PicsSchema = new Schema({
   bathRooms:{
     type: Number
   },
+  yearBuilt:{
+    type: Date
+  },
+  datePosted:{
+    type: Date,
+    default: Date.now()
+  },
+  parkingSpaces:{
+    type: Number
+  },
   amenities:[
     {
       type: String
     }
   ]
+});
+
+PicsSchema.virtual('daysPosted')
+.get(()=>{
+  return this.datePosted.diff(moment(Date.now(), 'days'));
 });
 
 const Pics = mongoose.model("Pics", PicsSchema);
