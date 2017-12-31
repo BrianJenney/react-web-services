@@ -33,6 +33,10 @@ const PicsSchema = new Schema({
   address:{
     type: String
   },
+  location:{
+    type: [Number],
+    index: '2d'
+  },
   price: {
     type: Number
   },
