@@ -1,63 +1,74 @@
-// Dependency
 const mongoose = require("mongoose");
 const moment = require("moment");
-
-// Create the Schema class
 const Schema = mongoose.Schema;
 
 const PicsSchema = new Schema({
 
   //id of user who posted
   userid: {
-    type: String
+    type: String,
+    required: true
   },
   propertyType:{
-    type: String
+    type: String,
+    required: true
   },
   description: {
-    type: String
+    type: String,
+    required: true
   },
   imgUrl: [{
     type: String,
-    trim: true
+    required: true
   }],
   zipCode:{
-    type: Number
+    type: Number,
+    required: true
   },
   city: {
-    type: String
+    type: String,
+    required: true
   },
   state:{
-    type: String
+    type: String,
+    required: true
   },
   address:{
-    type: String
+    type: String,
+    required: true
   },
   location:{
     type: [Number],
-    index: '2d'
+    index: '2d',
+    required: true
   },
   price: {
-    type: Number
+    type: Number,
+    required: true
   },
   sqFeet:{
-    type: Number
+    type: Number,
+    required: true
   },
   bedRooms:{
-    type: Number
+    type: Number,
+    required: true
   },
   bathRooms:{
-    type: Number
+    type: Number,
+    required: true
   },
   yearBuilt:{
-    type: Date
+    type: Date,
+    required: true 
   },
   datePosted:{
     type: Date,
     default: Date.now()
   },
   parkingSpaces:{
-    type: Number
+    type: Number,
+    required: true
   },
   amenities:[
     {
