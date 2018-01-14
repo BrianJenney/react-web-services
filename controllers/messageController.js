@@ -4,7 +4,7 @@ const db = require("../models");
 
 module.exports = {
     //upsert conversation
-    post: function(req, res) {
+    post: ((req, res)=> {
     db.Messages.update(
       { id: req.body.id},
       {
@@ -20,20 +20,20 @@ module.exports = {
     )
     .then(doc=> res.json(doc))
     .catch(doc=>res.json(err));
-    },
+    }),
 
     //get messages for user
-    getMessages: function(req, res){
+    getMessages: ((req, res)=>{
       db.Messages.find({participants: req.params.email})
       .then(doc => res.json(doc))
       .catch(err => res.json(err));
-    },
+    }),
 
     //get a convo based on two users
-    getConvo: function(req, res){
+    getConvo: ((req, res)=>{
       db.Messages.find({participants:{$all: [req.params.recipient, req.params.sender]}})
       .then(doc => res.json(doc))
       .catch(err => res.json(err));
-    }
+    })
     
   };
