@@ -2,7 +2,7 @@ const db = require('../models');
 const jwt = require('jsonwebtoken');
 
 module.exports = {
-  login: function(req, res) {
+  login: ((req, res) => {
     db.User.findOne({email : req.body.email})
       .then((user)=>{
 
@@ -28,17 +28,17 @@ module.exports = {
         res.json({errors: 'invalid password', message: 'Password or Username not found'})
       }
     })
-  },
+  }),
 
   //FOR TESTING ONLY - USE TO TEST AUTHENTICATE ROUTES
-  authenticate: function(req, res){
+  authenticate: ((req, res) => {
     console.log(req.params);
     jwt.verify(req.params.token, 'secret', (err, token)=>{
       console.log(token);
-    })
-  },
+    });
+  }),
 
-  register: function(req, res){
+  register: ((req, res) => {
     let newUser = db.User({
       income: req.body.income,
       SSN: req.body.SSN,
