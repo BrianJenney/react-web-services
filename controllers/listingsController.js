@@ -1,5 +1,4 @@
 
-
 const request = require('request')
 const username = 'simplyrets'
 const password = 'simplyrets'
@@ -9,18 +8,17 @@ const options = {
     user: username,
     password: password
   }
-};
+}
 
 module.exports = {
-    getHomeListings: ((req, res)=>{
-        request(options, function (err, resp, body) {
-            if (err) {
-              console.dir(err);
-              return
-            }
-            res.setHeader('Content-Type', 'application/json');
-            res.send(JSON.parse(JSON.stringify(body)));
-          });
+  getHomeListings: (req, res) => {
+    request(options, function (err, resp, body) {
+      if (err) {
+        console.dir(err)
+        return
+      }
+      res.setHeader('Content-Type', 'application/json')
+      res.send(JSON.parse(JSON.stringify(body)))
     })
-};
-
+  }
+}
