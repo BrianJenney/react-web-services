@@ -11,4 +11,3 @@ router.route('/authenticate/:token')
   .post(userController.authenticate)
 
 module.exports = router
-
