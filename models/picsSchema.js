@@ -1,15 +1,16 @@
-const mongoose = require("mongoose");
-const moment = require("moment");
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const moment = require('moment')
+const Schema = mongoose.Schema
 
 const PicsSchema = new Schema({
 
-  //id of user who posted
+  //  id of user who posted
+
   userid: {
     type: String,
     required: true
   },
-  propertyType:{
+  propertyType: {
     type: String,
     required: true
   },
@@ -21,7 +22,7 @@ const PicsSchema = new Schema({
     type: String,
     required: true
   }],
-  zipCode:{
+  zipCode: {
     type: Number,
     required: true
   },
@@ -29,15 +30,15 @@ const PicsSchema = new Schema({
     type: String,
     required: true
   },
-  state:{
+  state: {
     type: String,
     required: true
   },
-  address:{
+  address: {
     type: String,
     required: true
   },
-  location:{
+  location: {
     type: [Number],
     index: '2d',
     required: true
@@ -46,42 +47,42 @@ const PicsSchema = new Schema({
     type: Number,
     required: true
   },
-  sqFeet:{
+  sqFeet: {
     type: Number,
     required: true
   },
-  bedRooms:{
+  bedRooms: {
     type: Number,
     required: true
   },
-  bathRooms:{
+  bathRooms: {
     type: Number,
     required: true
   },
-  yearBuilt:{
+  yearBuilt: {
     type: Date,
-    required: true 
+    required: true
   },
-  datePosted:{
+  datePosted: {
     type: Date,
     default: Date.now()
   },
-  parkingSpaces:{
+  parkingSpaces: {
     type: Number,
     required: true
   },
-  amenities:[
+  amenities: [
     {
       type: String
     }
   ]
-});
+})
 
 PicsSchema.virtual('daysPosted')
-.get(()=>{
-  return this.datePosted.diff(moment(Date.now(), 'days'));
-});
+  .get(() => {
+    return this.datePosted.diff(moment(Date.now(), 'days'));
+  })
 
-const Pics = mongoose.model("Pics", PicsSchema);
+const Pics = mongoose.model('Pics', PicsSchema)
 
-module.exports = Pics;
+module.exports = Pics
