@@ -14,4 +14,7 @@ router.route("/getlistings/:userid")
 router.route("/getlistingsbyuser/:email")
   .get(picsController.getListingsByUser);
 
+router.route("/searchlistings")
+  .get(picsController.searchListings);
+
 module.exports = router;

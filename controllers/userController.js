@@ -51,5 +51,5 @@ module.exports = {
     newUser.save()
     .then(doc => res.json(doc))
     .catch(err => res.json(err));
-  }
+  })
 };
