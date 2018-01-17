@@ -2,10 +2,8 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const routes = require('./routes')
-const mongo = require('mongodb')
 const mongoose = require('mongoose')
 const uri = process.env.NODE_ENV ? process.env.mongo : require('./config.js').mongo
-const jwt = require('jsonwebtoken')
 const cors = require('cors')
 
 mongoose.connect(uri)
@@ -20,11 +18,9 @@ app.use(function (req, res, next) {
   next()
 })
 
-// Configure body parser for AJAX requests
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.listen(process.env.PORT || 8081)
 
-//  ROUTES
 app.use(routes)
