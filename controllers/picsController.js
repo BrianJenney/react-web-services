@@ -53,7 +53,8 @@ module.exports = {
     let conditions = {}
     let andClauses = []
     let lon, lat
-    let params = req.query
+
+    let params = JSON.parse(JSON.stringify(req.body))
 
     if (params.hasOwnProperty('address')) {
       await getLonLat(params.address).then((resp) => {

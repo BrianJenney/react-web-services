@@ -14,6 +14,6 @@ router.route('/getlistingsbyuser/:email')
   .get(picsController.getListingsByUser)
 
 router.route('/searchlistings')
-  .get(picsController.searchListings)
+  .post(picsController.searchListings)
 
 module.exports = router
