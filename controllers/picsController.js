@@ -56,18 +56,22 @@ module.exports = {
 
     let params = JSON.parse(JSON.stringify(req.body))
 
-    if (params.hasOwnProperty('address')) {
+    if (params.hasOwnProperty('address') && params.address.length) {
       await getLonLat(params.address).then((resp) => {
         [lon, lat] = [resp.data.results[0].geometry.location.lng, resp.data.results[0].geometry.location.lat]
       })
       andClauses.push({location: {$near: [lon, lat], $maxDistance: 10 / 10}})
     }
 
+    if (params.hasOwnProperty('bedRooms')) {
+      andClauses.push({ bedRooms: { $gte: params.bedRooms } })
+    }
+
     if (params.hasOwnProperty('maxPrice') && params.hasOwnProperty('minPrice')) {
       andClauses.push({ price: { $gt: params.minPrice, $lt: params.maxPrice } })
     }
 
-    let {maxPrice, minPrice, address, ...whereClause} = params
+    let {maxPrice, minPrice, address, bedRooms, ...whereClause} = params
 
     for (const prop in whereClause) {
       let query = {}
@@ -81,7 +85,6 @@ module.exports = {
       .then(doc => res.json(doc))
       .catch(err => res.json(err))
   }
-
 }
 
 //  GET ADDRESS LONGITUDE AND LATITUDE
