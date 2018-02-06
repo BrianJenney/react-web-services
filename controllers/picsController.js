@@ -57,7 +57,12 @@ module.exports = {
     let params = JSON.parse(JSON.stringify(req.body))
 
     if (params.hasOwnProperty('address') && params.address.length) {
-      await getLonLat(params.address).then((resp) => {
+      await getLonLat(params.address).then((resp, err) => {
+        if (err) {
+          console.log(err)
+          throw err
+        }
+
         [lon, lat] = [resp.data.results[0].geometry.location.lng, resp.data.results[0].geometry.location.lat]
       })
       andClauses.push({location: {$near: [lon, lat], $maxDistance: 10 / 10}})
