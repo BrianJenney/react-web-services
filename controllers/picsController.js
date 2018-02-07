@@ -1,12 +1,11 @@
 const db = require('../models')
-const keys = require('../config.js')
 const axios = require('axios')
 const cloudinary = require('cloudinary')
 
 cloudinary.config({
-  cloud_name: keys.cloduinary_cloud,
-  api_key: keys.cloudinary,
-  api_secret: keys.cloudinary_secret
+  cloud_name: process.env.NODE_ENV ? process.env.cloud_name : require('../config.js').cloduinary_cloud,
+  api_key: process.env.NODE_ENV ? process.env.cloudinary : require('../config.js').cloudinary,
+  api_secret: process.env.NODE_ENV ? process.env.cloudinary_secret : require('../config.js').cloudinary_secret
 })
 
 module.exports = {
@@ -21,8 +20,10 @@ module.exports = {
 
     let address = `${req.body.address} ${req.body.city}, ${req.body.state}, ${req.body.zipCode}`
 
+    const geoapi = process.env.NODE_ENV ? process.env.geoapi : require('../config.js').geoapi
+
     promise.then(() => {
-      axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${keys.geoapi}`).then((resp) => {
+      axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${geoapi}`).then((resp) => {
         req.body.location = [resp.data.results[0].geometry.location.lng, resp.data.results[0].geometry.location.lat]
         req.body.imgUrl = [imgUrl]
       }).then(() => {
