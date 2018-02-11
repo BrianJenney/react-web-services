@@ -1,6 +1,7 @@
 const db = require('../models')
 const axios = require('axios')
 const cloudinary = require('cloudinary')
+const geoKey = process.env.NODE_ENV ? process.env.geoapi : require('../config.js')
 
 cloudinary.config({
   cloud_name: process.env.NODE_ENV ? process.env.cloud_name : require('../config.js').cloduinary_cloud,
@@ -70,14 +71,20 @@ module.exports = {
     }
 
     if (params.hasOwnProperty('bedRooms')) {
-      andClauses.push({ bedRooms: { $gte: params.bedRooms } })
+      andClauses.push({ bedRooms: { $gte: (params.bedRooms || 0) } })
     }
 
     if (params.hasOwnProperty('maxPrice') && params.hasOwnProperty('minPrice')) {
-      andClauses.push({ price: { $gt: params.minPrice, $lt: params.maxPrice } })
+      andClauses.push({ price: { $gt: (params.minPrice || 0), $lt: (params.maxPrice || 1000000) } })
     }
 
-    let {maxPrice, minPrice, address, bedRooms, ...whereClause} = params
+    if (params.hasOwnProperty('propertyType')) {
+      if (params.propertyType !== null) {
+        andClauses.push({"propertyType": params.propertyType})
+      }
+    }
+
+    let {maxPrice, minPrice, address, bedRooms, propertyType, ...whereClause} = params
 
     for (const prop in whereClause) {
       let query = {}
@@ -95,5 +102,5 @@ module.exports = {
 
 //  GET ADDRESS LONGITUDE AND LATITUDE
 function getLonLat (address) {
-  return axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${keys.geoapi}`)
+  return axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${geoKey.geoapi}`)
 }
