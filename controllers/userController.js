@@ -1,5 +1,5 @@
-const db = require('../models');
-const jwt = require('jsonwebtoken');
+const db = require('../models')
+const jwt = require('jsonwebtoken')
 
 module.exports = {
   login: (req, res) => {

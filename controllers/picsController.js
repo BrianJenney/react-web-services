@@ -12,18 +12,23 @@ cloudinary.config({
 module.exports = {
 
   //  UPLOAD HOUSING DATA
-  upload: (req, res) => {
-    let imgUrl, promise
+  upload: async(req, res) => {
+    let imgUrl = [], promises = []
 
-    promise = cloudinary.uploader.upload(req.files.imgUrl.path, function (result) {
-      imgUrl = result.url
+    req.files.imgUrl.map((url) => {
+      promises.push(
+          cloudinary.uploader.upload(url.path, function (result) {
+          imgUrl.push(result.url)
+        })
+      )
     })
 
     let address = `${req.body.address} ${req.body.city}, ${req.body.state}, ${req.body.zipCode}`
 
     const geoapi = process.env.NODE_ENV ? process.env.geoapi : require('../config.js').geoapi
 
-    promise.then(() => {
+
+    Promise.all(promises).then(()=>{
       axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${geoapi}`).then((resp) => {
         req.body.location = [resp.data.results[0].geometry.location.lng, resp.data.results[0].geometry.location.lat]
         req.body.imgUrl = [imgUrl]
@@ -58,7 +63,7 @@ module.exports = {
 
     let params = JSON.parse(JSON.stringify(req.body))
 
-    if (params.hasOwnProperty('address') && params.address.length) {
+    if (params.hasOwnProperty('address') && params.address !== null) {
       await getLonLat(params.address).then((resp, err) => {
         if (err) {
           console.log(err)

@@ -80,7 +80,7 @@ const PicsSchema = new Schema({
 
 PicsSchema.virtual('daysPosted')
   .get(() => {
-    return this.datePosted.diff(moment(Date.now(), 'days'));
+    return this.datePosted.diff(moment(Date.now(), 'days'))
   })
 
 const Pics = mongoose.model('Pics', PicsSchema)
