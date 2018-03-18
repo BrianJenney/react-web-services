@@ -15,21 +15,20 @@ module.exports = {
   upload: async(req, res) => {
     let imgUrl = [], promises = []
 
-    req.files.imgUrl.map((url) => {
+    console.log(req.body);
+
+    req.body.imgs.map((file) => {
       promises.push(
-          cloudinary.uploader.upload(url.path, function (result) {
+          cloudinary.uploader.upload(file.path, function (result) {
           imgUrl.push(result.url)
         })
       )
     })
 
-    let address = `${req.body.address} ${req.body.city}, ${req.body.state}, ${req.body.zipCode}`
-
     const geoapi = process.env.NODE_ENV ? process.env.geoapi : require('../config.js').geoapi
 
-
     Promise.all(promises).then(()=>{
-      axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${geoapi}`).then((resp) => {
+      axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${req.address}&key=${geoapi}`).then((resp) => {
         req.body.location = [resp.data.results[0].geometry.location.lng, resp.data.results[0].geometry.location.lat]
         req.body.imgUrl = [imgUrl]
       }).then(() => {

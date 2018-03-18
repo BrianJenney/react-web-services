@@ -1,5 +1,5 @@
 module.exports = {
   User: require("./userSchema"),
-  Pics: require("./picsSchema"),
+  Property: require("./propertySchema"),
   Messages: require("./messagesSchema")
 }

@@ -2,11 +2,28 @@ const mongoose = require('mongoose')
 const moment = require('moment')
 const Schema = mongoose.Schema
 
-const PicsSchema = new Schema({
-
-  //  id of user who posted
-
+const PropertySchema = new Schema({
   userid: {
+    type: String,
+    required: true
+  },
+  owner: {
+    type: String,
+    required: true
+  },
+  balance: {
+    type: Number,
+    required: true
+  },
+  phone: {
+    type: String,
+    required: true
+  },
+  timeFrame: {
+    type: Number,
+    required: true
+  },
+  status: {
     type: String,
     required: true
   },
@@ -18,22 +35,10 @@ const PicsSchema = new Schema({
     type: String,
     required: true
   },
-  imgUrl: [{
+  imgs: [{
     type: String,
     required: true
   }],
-  zipCode: {
-    type: Number,
-    required: true
-  },
-  city: {
-    type: String,
-    required: true
-  },
-  state: {
-    type: String,
-    required: true
-  },
   address: {
     type: String,
     required: true
@@ -44,10 +49,6 @@ const PicsSchema = new Schema({
     required: true
   },
   price: {
-    type: Number,
-    required: true
-  },
-  sqFeet: {
     type: Number,
     required: true
   },
@@ -69,20 +70,15 @@ const PicsSchema = new Schema({
   },
   parkingSpaces: {
     type: Number,
-    required: true
-  },
-  amenities: [
-    {
-      type: String
-    }
-  ]
+    required: false
+  }
 })
 
-PicsSchema.virtual('daysPosted')
+PropertySchema.virtual('daysPosted')
   .get(() => {
     return this.datePosted.diff(moment(Date.now(), 'days'))
   })
 
-const Pics = mongoose.model('Pics', PicsSchema)
+const Property = mongoose.model('Pics', PropertySchema)
 
-module.exports = Pics
+module.exports = Property

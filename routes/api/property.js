@@ -1,19 +1,19 @@
 const verify = require('../auth/authVerify.js')
 const router = require('express').Router()
-const picsController = require('../../controllers/picsController')
+const propertyController = require('../../controllers/propertyController')
 const multipart = require('connect-multiparty')
 const multipartMiddleware = multipart()
 
 router.route('/upload')
-  .post(multipartMiddleware, picsController.upload)
+  .post(multipartMiddleware, propertyController.upload)
 
 router.route('/getlistings/:userid')
-  .get(picsController.getListings)
+  .get(propertyController.getListings)
 
 router.route('/getlistingsbyuser/:email')
-  .get(picsController.getListingsByUser)
+  .get(propertyController.getListingsByUser)
 
 router.route('/searchlistings')
-  .post(picsController.searchListings)
+  .post(propertyController.searchListings)
 
 module.exports = router
