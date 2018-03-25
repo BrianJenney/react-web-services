@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
-const moment = require('moment')
-const Schema = mongoose.Schema
+const moment   = require('moment')
+const Schema   = mongoose.Schema
 
 const PropertySchema = new Schema({
   userid: {
@@ -23,10 +23,17 @@ const PropertySchema = new Schema({
     type: Number,
     required: true
   },
-  status: {
+  email: {
     type: String,
     required: true
   },
+
+  // TODO: what is status?
+
+  // status: {
+  //   type: String,
+  //   required: true
+  // },
   propertyType: {
     type: String,
     required: true
