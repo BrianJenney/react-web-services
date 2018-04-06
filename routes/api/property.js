@@ -16,4 +16,7 @@ router.route('/getlistingsbyuser/:email')
 router.route('/searchlistings')
   .post(propertyController.searchListings)
 
+router.route('/info/:id')
+  .get(propertyController.houseInfo)
+
 module.exports = router

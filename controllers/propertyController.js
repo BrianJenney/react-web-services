@@ -1,6 +1,7 @@
 const db = require('../models')
 const axios = require('axios')
 const cloudinary = require('cloudinary')
+const ObjectId = require('mongodb').ObjectID;
 const geoKey = process.env.NODE_ENV ? process.env.geoapi : require('../config.js')
 
 cloudinary.config({
@@ -52,6 +53,14 @@ module.exports = {
     db.Property.find({'userEmail': req.params.email})
       .then(doc => res.json(doc))
       .catch(err => res.json(err))
+  },
+
+  // LISTING BY ID
+  houseInfo: (req, res) => {
+    console.log(req.params);
+    db.Property.find({'_id': new ObjectId(req.params.id)})
+    .then(doc => res.json(doc))
+    .catch(err => res.json(err))
   },
 
   //  SEARCH LISTINGS

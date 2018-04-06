@@ -78,6 +78,10 @@ const PropertySchema = new Schema({
   parkingSpaces: {
     type: Number,
     required: false
+  },
+  validProperty: {
+    type: Boolean,
+    default: true
   }
 })
 
