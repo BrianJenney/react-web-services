@@ -71,7 +71,7 @@ module.exports = {
     let params = JSON.parse(JSON.stringify(req.body))
 
 	  andClauses = await buildQuery(params)
-    let {maxPrice, minPrice, address, bedRooms, propertyType, ...whereClause} = params
+    let {maxPrice, minPrice, address, bedRooms, bathRooms, propertyType, ...whereClause} = params
 
     for (const prop in whereClause) {
       let query = {}
@@ -102,6 +102,10 @@ buildQuery = async (params) => {
     }
     if (params.hasOwnProperty('bedRooms')) {
       andClauses.push({ bedRooms: { $gte: (params.bedRooms || 0) } })
+    }
+
+    if (params.hasOwnProperty('bathRooms')) {
+      andClauses.push({ bathRooms: { $gte: (params.bathRooms || 0) } })
     }
 
     if (params.hasOwnProperty('maxPrice') && params.hasOwnProperty('minPrice')) {
