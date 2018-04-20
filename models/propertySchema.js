@@ -79,6 +79,10 @@ const PropertySchema = new Schema({
     type: Number,
     required: false
   },
+  sqFeet: {
+    type: Number,
+    required: false
+  },
   validProperty: {
     type: Boolean,
     default: true
