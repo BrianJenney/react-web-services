@@ -37,6 +37,9 @@ const UserSchema = new Schema({
   userType: {
     type: String
   },
+  liked: [{
+    type: String
+  }],
   // This will make a userCreated entry in our doc, by default the current time string.
   userCreated: {
     type: Date,

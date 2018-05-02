@@ -57,7 +57,6 @@ module.exports = {
 
   // LISTING BY ID
   houseInfo: (req, res) => {
-    console.log(req.params);
     db.Property.find({'_id': new ObjectId(req.params.id)})
     .then(doc => res.json(doc))
     .catch(err => res.json(err))
