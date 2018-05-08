@@ -7,7 +7,4 @@ router.route('/login')
 router.route('/register')
   .post(userController.register)
 
-router.route('/authenticate/:token')
-  .post(userController.authenticate)
-
 module.exports = router

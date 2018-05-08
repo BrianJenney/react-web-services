@@ -7,8 +7,6 @@ module.exports = {
       .then((user) => {
         if (user !== null) {
           if (user.validPassword(req.body.password)) {
-            console.log('valid')
-
             let token = jwt.sign({
               data: { email: user.email, password: user.password, _id: user._id }
             }, 'secret', { expiresIn: '1h' })
@@ -27,16 +25,6 @@ module.exports = {
           res.json({errors: 'invalid password', message: 'Password or Username not found'})
         }
       })
-  },
-
-  //  FOR TESTING ONLY - USE TO TEST AUTHENTICATE ROUTES
-  authenticate: (req, res) => {
-    jwt.verify(req.params.token, 'secret', (err, token) => {
-      if (err) {
-        throw (err)
-      }
-      console.log(token)
-    })
   },
 
   register: (req, res) => {
