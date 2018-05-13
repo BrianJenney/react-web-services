@@ -9,7 +9,7 @@ module.exports = {
           if (user.validPassword(req.body.password)) {
             let token = jwt.sign({
               data: { email: user.email, password: user.password, _id: user._id }
-            }, 'secret', { expiresIn: '1h' })
+            }, 'secret', { expiresIn: '365 days' })
 
             const userInfo = {
               email: user.email,
@@ -17,12 +17,12 @@ module.exports = {
               _id: user._id
             }
 
-            res.json({userInfo, token: token})
+            res.json({ userInfo, token: token })
           } else {
-            res.json({errors: 'invalid password', message: 'Password or Username not found'})
+            res.json({ errors: 'invalid password', message: 'Password or Username not found' })
           }
         } else {
-          res.json({errors: 'invalid password', message: 'Password or Username not found'})
+          res.json({ errors: 'invalid password', message: 'Password or Username not found' })
         }
       })
   },

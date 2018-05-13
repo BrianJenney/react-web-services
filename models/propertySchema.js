@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
-const moment   = require('moment')
-const Schema   = mongoose.Schema
+const moment = require('moment')
+const Schema = mongoose.Schema
 
 const PropertySchema = new Schema({
   userid: {
