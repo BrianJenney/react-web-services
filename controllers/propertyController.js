@@ -23,8 +23,7 @@ module.exports = {
     upload: async (req, res) => {
         let imgUrl = [],
             promises = [];
-        console.log(req.body);
-        conole.log(req.files);
+
         req.files.map(file => {
             promises.push(
                 cloudinary.uploader.upload(file.path, function(result) {
