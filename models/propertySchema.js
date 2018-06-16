@@ -5,12 +5,12 @@ const Schema = mongoose.Schema;
 const PropertySchema = new Schema({
     userid: {
         type: String,
-        enum: ["draft", "published"],
-        default: "draft",
         required: true
     },
     status: {
         type: String,
+        enum: ["draft", "published"],
+        default: "draft",
         required: true
     },
     propertyType: {
