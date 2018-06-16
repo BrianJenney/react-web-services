@@ -5,14 +5,14 @@ const Schema = mongoose.Schema;
 const PropertySchema = new Schema({
     userid: {
         type: String,
+        enum: ["draft", "published"],
+        default: "draft",
         required: true
     },
-    // TODO: what is status?
-
-    // status: {
-    //   type: String,
-    //   required: true
-    // },
+    status: {
+        type: String,
+        required: true
+    },
     propertyType: {
         type: String,
         required: true
@@ -68,10 +68,6 @@ const PropertySchema = new Schema({
         type: Boolean,
         default: true
     }
-});
-
-PropertySchema.virtual("daysPosted").get(() => {
-    return this.datePosted.diff(moment(Date.now(), "days"));
 });
 
 const Property = mongoose.model("Pics", PropertySchema);
