@@ -4,7 +4,7 @@ const cloudinary = require("cloudinary");
 const ObjectId = require("mongodb").ObjectID;
 const geoKey = process.env.NODE_ENV
     ? process.env.geoapi
-    : require("../config.js");
+    : require("../config.js").geoapi;
 
 cloudinary.config({
     cloud_name: process.env.NODE_ENV
@@ -23,7 +23,8 @@ module.exports = {
     upload: async (req, res) => {
         let imgUrl = [],
             promises = [];
-        req.files.map(file => {
+
+        req.files.file.map(file => {
             promises.push(
                 cloudinary.uploader.upload(file.path, function(result) {
                     imgUrl.push(result.url);
@@ -31,16 +32,12 @@ module.exports = {
             );
         });
 
-        const geoapi = process.env.NODE_ENV
-            ? process.env.geoapi
-            : require("../config.js").geoapi;
-
         Promise.all(promises).then(() => {
             axios
                 .get(
                     `https://maps.googleapis.com/maps/api/geocode/json?address=${
                         req.body.address
-                    }&key=${geoapi}`
+                    }&key=${geoKey}`
                 )
                 .then(resp => {
                     req.body.location = [
@@ -168,9 +165,7 @@ buildQuery = async params => {
 
 getLonLat = address => {
     return axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${
-            geoKey.geoapi
-        }`
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${geoKey}`
     );
 };
 
