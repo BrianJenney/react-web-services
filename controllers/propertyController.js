@@ -8,7 +8,7 @@ const geoKey = process.env.NODE_ENV
 
 cloudinary.config({
     cloud_name: process.env.NODE_ENV
-        ? process.env.cloud_name
+        ? process.env.cloduinary_cloud
         : require("../config.js").cloduinary_cloud,
     api_key: process.env.NODE_ENV
         ? process.env.cloudinary
