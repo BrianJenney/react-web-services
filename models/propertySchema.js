@@ -9,7 +9,7 @@ const PropertySchema = new Schema({
     },
     status: {
         type: String,
-        enum: ["draft", "published"],
+        enum: ["draft", "publish"],
         default: "draft",
         required: true
     },
