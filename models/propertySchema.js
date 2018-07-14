@@ -70,6 +70,6 @@ const PropertySchema = new Schema({
     }
 });
 
-const Property = mongoose.model("Pics", PropertySchema);
+const Property = mongoose.model("Property", PropertySchema);
 
 module.exports = Property;

@@ -1,5 +1,17 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
+const cloudinary = require("cloudinary");
+cloudinary.config({
+    cloud_name: process.env.NODE_ENV
+        ? process.env.cloduinary_cloud
+        : require("../config.js").cloduinary_cloud,
+    api_key: process.env.NODE_ENV
+        ? process.env.cloudinary
+        : require("../config.js").cloudinary,
+    api_secret: process.env.NODE_ENV
+        ? process.env.cloudinary_secret
+        : require("../config.js").cloudinary_secret
+});
 
 module.exports = {
     login: (req, res) => {
@@ -56,12 +68,23 @@ module.exports = {
             .catch(err => res.json(err));
     },
 
-    updateProfile: (req, res) => {
-        console.log(req.body);
+    updateProfile: async (req, res) => {
+        const hasFile = Object.keys(req.files).length;
+        let imgUrl;
+
+        if (hasFile) {
+            await cloudinary.uploader.upload(req.files.file.path, result => {
+                imgUrl = result.url;
+            });
+        }
+
         db.User.update(
             { _id: req.body.id },
             {
-                $set: { phoneNumber: req.body.phoneNumber }
+                $set: {
+                    phoneNumber: req.body.phoneNumber,
+                    userPic: imgUrl
+                }
             }
         )
             .then(doc => res.json(doc))

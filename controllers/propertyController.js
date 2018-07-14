@@ -117,6 +117,8 @@ module.exports = {
     }
 };
 
+//private
+
 buildQuery = async params => {
     let andClauses = [];
 
