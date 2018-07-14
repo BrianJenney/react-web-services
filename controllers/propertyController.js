@@ -21,6 +21,7 @@ cloudinary.config({
 module.exports = {
     //  UPLOAD HOUSING DATA
     upload: async (req, res) => {
+        console.log(req.body);
         let imgUrl = [],
             promises = [];
 

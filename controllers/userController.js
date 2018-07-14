@@ -54,5 +54,17 @@ module.exports = {
             .save()
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
+    },
+
+    updateProfile: (req, res) => {
+        console.log(req.body);
+        db.User.update(
+            { _id: req.body.id },
+            {
+                $set: { phoneNumber: req.body.phoneNumber }
+            }
+        )
+            .then(doc => res.json(doc))
+            .catch(err => res.json(err));
     }
 };
