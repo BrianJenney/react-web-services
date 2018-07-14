@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const user = require("./register");
+const user = require("./user");
 const property = require("./property");
 const messages = require("./message");
 
