@@ -79,7 +79,7 @@ module.exports = {
         }
 
         db.User.update(
-            { _id: req.body.id },
+            { email: req.body.userEmail },
             {
                 $set: {
                     phoneNumber: req.body.phoneNumber,
