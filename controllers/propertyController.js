@@ -72,24 +72,26 @@ module.exports = {
     },
 
     // LISTING BY ID
-    houseInfo: (req, res) => {
-        db.Property.find({ _id: new ObjectId(req.params.id) })
-            .then(doc => {
-                const monthly = getMortgage(doc[0].price);
-                res.json({
-                    doc,
-                    monthly
-                });
-            })
-            .catch(err => res.json(err));
+    houseInfo: async (req, res) => {
+        const doc = await db.Property.find({
+            _id: new ObjectId(req.params.id)
+        });
+        const monthly = getMortgage(doc[0].price);
+        const user = await getUserEmail(doc[0].userid);
+
+        res.json({
+            doc,
+            monthly,
+            user: user[0]
+        });
     },
 
     //  SEARCH LISTINGS
     searchListings: async (req, res) => {
         let conditions = {};
-        let lon, lat, andClauses;
+        let lon, lat, andClauses, params;
 
-        let params = JSON.parse(JSON.stringify(req.body));
+        params = JSON.parse(JSON.stringify(req.body));
 
         andClauses = await buildQuery(params);
         let {
@@ -169,6 +171,10 @@ getLonLat = address => {
     return axios.get(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${geoKey}`
     );
+};
+
+getUserEmail = userId => {
+    return db.User.find({ _id: new ObjectId(userId) });
 };
 
 getMortgage = price => {

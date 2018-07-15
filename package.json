@@ -20,7 +20,7 @@
     "jsonwebtoken": "^8.1.0",
     "moment": "^2.20.1",
     "momentjs": "^2.0.0",
-    "mongodb": "^2.2.33",
+    "mongodb": "^2.2.35",
     "mongoose": "^4.13.5"
   },
   "devDependencies": {
