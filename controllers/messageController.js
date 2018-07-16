@@ -1,4 +1,5 @@
 const db = require("../models");
+const ObjectId = require("mongodb").ObjectID;
 
 module.exports = {
     //  upsert conversation
@@ -11,11 +12,22 @@ module.exports = {
                     messages: {
                         from: req.body.from,
                         to: req.body.to,
-                        text: req.body.text
+                        text: req.body.text,
+                        viewed: false
                     }
                 }
             },
             { upsert: true }
+        )
+            .then(doc => res.json(doc))
+            .catch(err => res.json(err));
+    },
+
+    //set message to viewed
+    viewMessage: async (req, res) => {
+        db.Messages.update(
+            { "messages._id": ObjectId(req.body.messageId) },
+            { $set: { "messages.$.viewed": true } }
         )
             .then(doc => res.json(doc))
             .catch(err => res.json(err));

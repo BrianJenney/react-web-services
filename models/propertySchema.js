@@ -9,7 +9,7 @@ const PropertySchema = new Schema({
     },
     status: {
         type: String,
-        enum: ["draft", "published"],
+        enum: ["draft", "publish"],
         default: "draft",
         required: true
     },
@@ -70,6 +70,6 @@ const PropertySchema = new Schema({
     }
 });
 
-const Property = mongoose.model("Pics", PropertySchema);
+const Property = mongoose.model("Property", PropertySchema);
 
 module.exports = Property;
