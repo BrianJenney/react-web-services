@@ -71,6 +71,35 @@ module.exports = {
             .catch(err => res.json(err));
     },
 
+    // UPLOAD PROPERTY DISCLOSURE
+    uploadDisclosure: async (req, res) => {
+        let imgUrl;
+
+        console.log(req.files.file.path);
+
+        await cloudinary.uploader
+            .upload(req.files.file.path, { resource_type: "auto" }, function(
+                error,
+                result
+            ) {
+                console.log(result, error);
+            })
+            .catch(e => {
+                console.log(e);
+            });
+
+        db.Property.update(
+            { email: req.body.userEmail },
+            {
+                $set: {
+                    disclosureAgreement: imgUrl
+                }
+            }
+        )
+            .then(doc => res.json(doc))
+            .catch(err => res.json(err));
+    },
+
     // LISTING BY ID
     houseInfo: async (req, res) => {
         const doc = await db.Property.find({

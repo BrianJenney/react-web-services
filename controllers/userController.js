@@ -33,7 +33,9 @@ module.exports = {
                     const userInfo = {
                         email: user.email,
                         userType: user.userType,
-                        _id: user._id
+                        _id: user._id,
+                        profilePic: user.profilePic,
+                        phone: user.phoneNumber
                     };
 
                     res.json({ userInfo, token: token });

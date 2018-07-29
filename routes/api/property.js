@@ -16,4 +16,8 @@ router.route("/searchlistings").post(propertyController.searchListings);
 
 router.route("/info/:id").get(propertyController.houseInfo);
 
+router
+    .route("/disclosure")
+    .post(multipartMiddleware, propertyController.uploadDisclosure);
+
 module.exports = router;
