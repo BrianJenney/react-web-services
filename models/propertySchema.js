@@ -27,6 +27,10 @@ const PropertySchema = new Schema({
             required: true
         }
     ],
+    disclosureAgreement: {
+        type: String,
+        required: false
+    },
     address: {
         type: String,
         required: true
