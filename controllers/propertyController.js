@@ -66,7 +66,8 @@ module.exports = {
 
     //  LISTINGS BY USER
     getListingsByUser: (req, res) => {
-        db.Property.find({ userEmail: req.params.email })
+        const user = db.User.find({ email: req.params.email });
+        db.Property.find({ userId: user.id })
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
     },
