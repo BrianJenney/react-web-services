@@ -76,8 +76,6 @@ module.exports = {
     uploadDisclosure: async (req, res) => {
         let imgUrl;
 
-        console.log(req.files.file.path);
-
         await cloudinary.uploader
             .upload(req.files.file.path, { resource_type: "auto" }, function(
                 error,
