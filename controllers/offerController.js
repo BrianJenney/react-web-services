@@ -21,15 +21,18 @@ cloudinary.config({
 module.exports = {
     //CREATE AN OFFER
     makeOffer: async (req, res) => {
-        db.Offer.update(
-            { homeId: req.body.homeId, userId: req.body.userId },
-            {
-                $set: { ...req.body }
-            },
-            { upsert: true }
-        )
-            .then(doc => res.json(doc))
-            .catch(err => res.json(err));
+        let imgUrl;
+        if (req.files) {
+            await cloudinary.uploader
+                .upload(req.files.file.path, function(result) {
+                    updateOfferAgreement(req.body, result.url, res);
+                })
+                .catch(e => {
+                    res.json(e);
+                });
+        } else {
+            updateOfferPrice(req.body, res);
+        }
     },
 
     // GET ALL OFFERS FOR A HOME
@@ -39,5 +42,47 @@ module.exports = {
         })
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
+    },
+
+    // GET OFFER INFO BY USER AND HOME
+    getOffersByuser: (req, res) => {
+        let imgUrl;
+
+        db.Offer.where({
+            homeId: req.body.homeId,
+            userId: req.body.userId
+        })
+            .then(doc => res.json(doc))
+            .catch(err => res.json(err));
     }
 };
+
+//private
+
+function updateOfferPrice(obj, res) {
+    db.Offer.update(
+        { homeId: obj.homeId, userId: obj.userId },
+        {
+            $set: { ...obj }
+        },
+        { upsert: true }
+    )
+        .then(doc => res.json(doc))
+        .catch(err => res.json(err));
+}
+
+function updateOfferAgreement(obj, img, res) {
+    db.Offer.update(
+        { homeId: obj.homeId, userId: obj.userId },
+        {
+            $set: {
+                purchaseAgreement: img,
+                homeId: obj.homeId,
+                userId: obj.userId
+            }
+        },
+        { upsert: true }
+    )
+        .then(doc => res.json(doc))
+        .catch(err => res.json(err));
+}
