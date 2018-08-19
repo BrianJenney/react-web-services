@@ -77,7 +77,7 @@ module.exports = {
         let imgUrl;
 
         await cloudinary.uploader
-            .upload(req.files.file.path, { resource_type: "auto" }, function(
+            .upload(req.files.file.path, { resource_type: "raw" }, function(
                 error,
                 result
             ) {
