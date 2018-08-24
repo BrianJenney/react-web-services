@@ -37,7 +37,7 @@ module.exports = {
 
     // GET ALL OFFERS FOR A HOME
     getOffers: async (req, res) => {
-        db.Offer.where({
+        db.Offer.find({
             homeId: req.body.homeId
         })
             .then(doc => res.json(doc))
@@ -48,7 +48,7 @@ module.exports = {
     getOffersByuser: (req, res) => {
         let imgUrl;
 
-        db.Offer.where({
+        db.Offer.find({
             homeId: req.body.homeId,
             userId: req.body.userId
         })
