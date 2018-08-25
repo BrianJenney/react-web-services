@@ -24,11 +24,11 @@ module.exports = {
         let imgUrl;
         if (req.files) {
             await cloudinary.uploader
-                .upload(req.files.file.path, function(result) {
+                .upload(req.files.file.path, function(result, error) {
                     updateOfferAgreement(req.body, result.url, res);
                 })
-                .catch(e => {
-                    res.json(e);
+                .catch(error => {
+                    handleError(error, res);
                 });
         } else {
             updateOfferPrice(req.body, res);
@@ -85,4 +85,8 @@ function updateOfferAgreement(obj, img, res) {
     )
         .then(doc => res.json(doc))
         .catch(err => res.json(err));
+}
+
+function handleError(e, res) {
+    res.json(e);
 }
