@@ -28,7 +28,11 @@ const OfferSchema = new Schema({
             type: String,
             required: false
         }
-    ]
+    ],
+    readyToSend: {
+        type: Boolean,
+        default: false
+    }
 });
 
 const Offer = mongoose.model("Offer", OfferSchema);

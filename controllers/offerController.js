@@ -5,6 +5,7 @@ const ObjectId = require("mongodb").ObjectID;
 const geoKey = process.env.NODE_ENV
     ? process.env.geoapi
     : require("../config.js").geoapi;
+const Mailer = require("../mailer/mail");
 
 cloudinary.config({
     cloud_name: process.env.NODE_ENV
@@ -35,6 +36,38 @@ module.exports = {
         }
     },
 
+    // SUBMIT OFFER
+    submitOffer: async (req, res) => {
+        const home = await db.Property.find({
+            _id: new ObjectId(req.body.homeId)
+        });
+        const recipient = await db.User.find({
+            _id: ObjectId(home[0].userid)
+        });
+        const sender = await db.User.find({
+            _id: ObjectId(req.body.userId)
+        });
+
+        db.Offer.update(
+            { userId: req.body.userId },
+            {
+                $set: { readyToSend: true }
+            },
+            { upsert: true }
+        )
+            .then(() => {
+                const mailer = new Mailer(
+                    recipient[0].email,
+                    sender[0].email,
+                    "Offer",
+                    "<h1>Test</h1>",
+                    res
+                );
+                mailer.sendMail();
+            })
+            .catch(err => res.json(err));
+    },
+
     // GET ALL OFFERS FOR A HOME
     getOffers: async (req, res) => {
         db.Offer.find({
@@ -46,8 +79,6 @@ module.exports = {
 
     // GET OFFER INFO BY USER AND HOME
     getOffersByuser: (req, res) => {
-        let imgUrl;
-
         db.Offer.find({
             homeId: req.body.homeId,
             userId: req.body.userId
