@@ -1,5 +1,7 @@
 const nodemailer = require("nodemailer");
 const config = require("../config.js");
+const ENV = process.env.NODE_ENV ? "PROD" : "DEV";
+const DEV_TEAM = "brianjenney83@gmail.com";
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -22,14 +24,13 @@ class Mailer {
     sendMail() {
         const mailOptions = {
             from: this.sender,
-            to: this.recipient,
+            to: ENV === "PROD" ? this.recipient : DEV_TEAM,
             subject: this.subject,
             html: this.html
         };
 
         this.transporter.sendMail(mailOptions, (err, info) => {
             if (err) {
-                console.log(err);
                 this.res.json(err);
             } else {
                 this.res.json({ ok: 200 });

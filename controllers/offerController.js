@@ -68,11 +68,17 @@ module.exports = {
             .catch(err => res.json(err));
     },
 
-    // GET ALL OFFERS FOR A HOME
+    // GET ALL OFFERS BELONGING TO A USER
     getOffers: async (req, res) => {
-        db.Offer.find({
-            homeId: req.body.homeId
-        })
+        const homes = await db.Property.find({
+            userid: req.body.userId
+        });
+
+        const homeIds = homes.map(home => {
+            return home._id;
+        });
+
+        db.Offer.find({ homeId: { $in: homeIds } })
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
     },
