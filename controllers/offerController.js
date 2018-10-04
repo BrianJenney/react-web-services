@@ -36,6 +36,8 @@ module.exports = {
         }
     },
 
+    //TODO: check if offer can be submitted
+
     // SUBMIT OFFER
     submitOffer: async (req, res) => {
         const home = await db.Property.find({
@@ -49,7 +51,7 @@ module.exports = {
         });
 
         db.Offer.update(
-            { userId: req.body.userId },
+            { userId: new ObjectId(req.body.userId) },
             {
                 $set: { readyToSend: true }
             },
@@ -75,10 +77,26 @@ module.exports = {
         });
 
         const homeIds = homes.map(home => {
-            return home._id;
+            return `${home._id}`;
         });
 
-        db.Offer.find({ homeId: { $in: homeIds } })
+        db.Offer.aggregate([
+            {
+                $match: {
+                    homeId: {
+                        $in: homeIds
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "users"
+                }
+            }
+        ])
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
     },
