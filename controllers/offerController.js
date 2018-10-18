@@ -70,7 +70,7 @@ module.exports = {
             .catch(err => res.json(err));
     },
 
-    // GET ALL OFFERS BELONGING TO A USER
+    // GET ALL OFFERS BELONGING TO A SELLER
     getOffers: async (req, res) => {
         const homes = await db.Property.find({
             userid: req.body.userId
@@ -116,7 +116,7 @@ module.exports = {
 
 function updateOfferPrice(obj, res) {
     db.Offer.update(
-        { homeId: obj.homeId, userId: obj.userId },
+        { homeId: obj.homeId, userId: ObjectId(obj.userId) },
         {
             $set: { ...obj }
         },
