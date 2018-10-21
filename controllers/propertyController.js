@@ -99,11 +99,15 @@ module.exports = {
             .catch(err => res.json(err));
     },
 
-    // LISTING BY ID
+    // LISTING BY ID OR EMAIL
     houseInfo: async (req, res) => {
-        const doc = await db.Property.find({
-            _id: new ObjectId(req.params.id)
-        });
+        const isEmail = req.params.id.includes("@");
+
+        const query = isEmail
+            ? { email: req.params.id }
+            : { _id: new ObjectId(req.params.id) };
+
+        const doc = await db.Property.find(query);
         const monthly = getMortgage(doc[0].price);
         const user = await getUserEmail(doc[0].userid);
 
