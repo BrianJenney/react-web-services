@@ -110,6 +110,30 @@ module.exports = {
             },
             res
         );
+
+        const recipient = await db.User.find({
+            _id: new ObjectId(offer.userId)
+        });
+
+        const home = await db.Property.find({
+            _id: new ObjectId(offer.homeId)
+        });
+
+        const sender = await db.User.find({
+            _id: new ObjectId(home[0].userid)
+        });
+
+        const mailer = new Mailer(
+            recipient[0].email,
+            sender[0].email,
+            "Offer Accepted",
+            `<p>Your offer on the property, ${
+                home[0].address
+            } has been accepted!</p> 
+            <p>Visit TBD <a href='localhost:3000/dashboard'>dashboard</a> for the next steps.</p>`,
+            res
+        );
+        mailer.sendMail();
     },
 
     // GET ALL OFFERS BELONGING TO A SELLER
