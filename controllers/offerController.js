@@ -36,7 +36,7 @@ module.exports = {
         }
     },
 
-    //TODO: check if offer can be submitted
+    //TODO: check if offer can be submitted (needs purchase doc and loan doc)
 
     // SUBMIT OFFER
     submitOffer: async (req, res) => {
@@ -50,24 +50,36 @@ module.exports = {
             _id: ObjectId(req.body.userId)
         });
 
-        db.Offer.update(
-            { userId: new ObjectId(req.body.userId), homeId: home._id },
-            {
-                $set: { readyToSend: true }
-            },
-            { upsert: true }
-        )
-            .then(() => {
-                const mailer = new Mailer(
-                    recipient[0].email,
-                    sender[0].email,
-                    "Offer",
-                    "<h1>Test</h1>",
-                    res
-                );
-                mailer.sendMail();
-            })
-            .catch(err => res.json(err));
+        const offer = await db.Offer.find({
+            userId: new ObjectId(req.body.userId),
+            homeId: home[0]._id
+        });
+
+        if (offer.length && offer[0].readyToSend) {
+            res.json({ message: "offer already sent" });
+        } else {
+            db.Offer.update(
+                { userId: new ObjectId(req.body.userId), homeId: home._id },
+                {
+                    $set: { readyToSend: true }
+                },
+                { upsert: true }
+            )
+                .then(() => {
+                    const mailer = new Mailer(
+                        recipient[0].email,
+                        sender[0].email,
+                        "Offer",
+                        `<p>You have an offer on from ${
+                            sender[0].email
+                        } on your property.</p> 
+                        <p>Visit your <a href='localhost:3000/dashboard'>dashboard</a> to review this offer.</p>`,
+                        res
+                    );
+                    mailer.sendMail();
+                })
+                .catch(err => res.json(err));
+        }
     },
 
     // GET ALL OFFERS BELONGING TO A SELLER
