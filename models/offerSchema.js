@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const OfferSchema = new Schema({
     userId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         required: true
     },
     purchaseAgreement: {
@@ -36,6 +36,13 @@ const OfferSchema = new Schema({
     createdDate: {
         type: Date,
         default: Date.now()
+    },
+    accepted: {
+        type: Boolean,
+        default: false
+    },
+    acceptedDate: {
+        type: Date
     }
 });
 

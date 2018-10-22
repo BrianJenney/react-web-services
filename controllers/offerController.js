@@ -26,13 +26,26 @@ module.exports = {
         if (req.files) {
             await cloudinary.uploader
                 .upload(req.files.file.path, function(result, error) {
-                    updateOfferAgreement(req.body, result.url, res);
+                    const updateObj = {
+                        purchaseAgreement: result.url,
+                        homeId: req.body.homeId,
+                        userId: new ObjectId(req.body.userId)
+                    };
+
+                    updateOffer(updateObj, res);
                 })
                 .catch(error => {
                     handleError(error, res);
                 });
         } else {
-            updateOfferPrice(req.body, res);
+            updateOffer(
+                {
+                    homeId: req.body.homeId,
+                    userId: new ObjectId(req.body.userId),
+                    offer: req.body.offer
+                },
+                res
+            );
         }
     },
 
@@ -44,10 +57,10 @@ module.exports = {
             _id: new ObjectId(req.body.homeId)
         });
         const recipient = await db.User.find({
-            _id: ObjectId(home[0].userid)
+            _id: new ObjectId(home[0].userid)
         });
         const sender = await db.User.find({
-            _id: ObjectId(req.body.userId)
+            _id: new ObjectId(req.body.userId)
         });
 
         const offer = await db.Offer.find({
@@ -80,6 +93,23 @@ module.exports = {
                 })
                 .catch(err => res.json(err));
         }
+    },
+
+    //ACCEPT OFFER
+    acceptOffer: async (req, res) => {
+        const offer = req.body;
+
+        //get all offers for home and see if any have been accepted - if so, return `can't accept`
+
+        updateOffer(
+            {
+                homeId: offer.homeId,
+                userId: new ObjectId(offer.userId),
+                accepted: true,
+                acceptedDate: Date.now()
+            },
+            res
+        );
     },
 
     // GET ALL OFFERS BELONGING TO A SELLER
@@ -126,27 +156,11 @@ module.exports = {
 
 //private
 
-function updateOfferPrice(obj, res) {
+function updateOffer(obj, res) {
     db.Offer.update(
-        { homeId: obj.homeId, userId: ObjectId(obj.userId) },
+        { homeId: obj.homeId, userId: new ObjectId(obj.userId) },
         {
             $set: { ...obj }
-        },
-        { upsert: true }
-    )
-        .then(doc => res.json(doc))
-        .catch(err => res.json(err));
-}
-
-function updateOfferAgreement(obj, img, res) {
-    db.Offer.update(
-        { homeId: obj.homeId, userId: obj.userId },
-        {
-            $set: {
-                purchaseAgreement: img,
-                homeId: obj.homeId,
-                userId: obj.userId
-            }
         },
         { upsert: true }
     )

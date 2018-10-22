@@ -13,4 +13,6 @@ router.route("/getoffers").post(offerController.getOffers);
 
 router.route("/submitoffer").post(offerController.submitOffer);
 
+router.route("/acceptoffer").post(offerController.acceptOffer);
+
 module.exports = router;
