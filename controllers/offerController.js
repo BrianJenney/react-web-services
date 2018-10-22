@@ -51,7 +51,7 @@ module.exports = {
         });
 
         db.Offer.update(
-            { userId: new ObjectId(req.body.userId) },
+            { userId: new ObjectId(req.body.userId), homeId: home._id },
             {
                 $set: { readyToSend: true }
             },
