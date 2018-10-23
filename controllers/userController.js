@@ -1,6 +1,8 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary");
+const ObjectId = require("mongodb").ObjectID;
+
 cloudinary.config({
     cloud_name: process.env.NODE_ENV
         ? process.env.cloduinary_cloud
@@ -52,6 +54,12 @@ module.exports = {
                 });
             }
         });
+    },
+
+    userInfo: (req, res) => {
+        db.User.findOne({ _id: new ObjectId(req.params.id) })
+            .then(doc => res.json(doc))
+            .catch(err => res.json(err));
     },
 
     register: (req, res) => {

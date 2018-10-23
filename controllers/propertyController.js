@@ -67,8 +67,8 @@ module.exports = {
     //  LISTINGS BY USER
     getListingsByUser: async (req, res) => {
         const user = await db.User.find({ email: req.params.email });
-        console.log(user);
-        db.Property.find({ userId: user[0]._id })
+
+        db.Property.find({ userid: user[0]._id })
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
     },
@@ -109,8 +109,9 @@ module.exports = {
             : { _id: new ObjectId(req.params.id) };
 
         const doc = await db.Property.find(query);
-        const monthly = getMortgage(doc[0].price);
-        const user = await getUserEmail(doc[0].userid);
+
+        const monthly = doc.length ? getMortgage(doc[0].price) : 0;
+        const user = doc.length ? await getUserEmail(doc[0].userid) : [];
 
         res.json({
             doc,
