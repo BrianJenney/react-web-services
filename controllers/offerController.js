@@ -26,8 +26,14 @@ module.exports = {
         if (req.files) {
             await cloudinary.uploader
                 .upload(req.files.file.path, function(result, error) {
+                    const isPurchaseDoc = req.body.isPurchaseDoc === "true";
+
+                    const typeOfFile = isPurchaseDoc
+                        ? "purchaseAgreement"
+                        : "loanDocument";
+
                     const updateObj = {
-                        purchaseAgreement: result.url,
+                        [typeOfFile]: result.url,
                         homeId: req.body.homeId,
                         userId: new ObjectId(req.body.userId)
                     };
@@ -99,18 +105,6 @@ module.exports = {
     acceptOffer: async (req, res) => {
         const offer = req.body;
 
-        //get all offers for home and see if any have been accepted - if so, return `can't accept`
-
-        updateOffer(
-            {
-                homeId: offer.homeId,
-                userId: new ObjectId(offer.userId),
-                accepted: true,
-                acceptedDate: Date.now()
-            },
-            res
-        );
-
         const recipient = await db.User.find({
             _id: new ObjectId(offer.userId)
         });
@@ -119,21 +113,47 @@ module.exports = {
             _id: new ObjectId(offer.homeId)
         });
 
-        const sender = await db.User.find({
-            _id: new ObjectId(home[0].userid)
-        });
+        const offersForHome = await db.Offer.find({ homeId: offer.homeId });
 
-        const mailer = new Mailer(
-            recipient[0].email,
-            sender[0].email,
-            "Offer Accepted",
-            `<p>Your offer on the property, ${
-                home[0].address
-            } has been accepted!</p> 
-            <p>Visit TBD <a href='localhost:3000/dashboard'>dashboard</a> for the next steps.</p>`,
-            res
-        );
-        mailer.sendMail();
+        const hasOffer = offersForHome
+            .map(offer => {
+                if ("accepted" in offer) {
+                    return offer.accepted;
+                } else {
+                    return false;
+                }
+            })
+            .includes(true);
+
+        if (hasOffer) {
+            res.json({ message: "offer already accepted" });
+        } else {
+            updateOffer(
+                {
+                    homeId: offer.homeId,
+                    userId: new ObjectId(offer.userId),
+                    accepted: true,
+                    acceptedDate: Date.now()
+                },
+                res
+            );
+
+            const sender = await db.User.find({
+                _id: new ObjectId(home[0].userid)
+            });
+
+            const mailer = new Mailer(
+                recipient[0].email,
+                sender[0].email,
+                "Offer Accepted",
+                `<p>Your offer on the property, ${
+                    home[0].address
+                } has been accepted!</p> 
+                    <p>Visit TBD <a href='localhost:3000/dashboard'>dashboard</a> for the next steps.</p>`,
+                res
+            );
+            mailer.sendMail();
+        }
     },
 
     // GET ALL OFFERS BELONGING TO A SELLER
@@ -181,7 +201,7 @@ module.exports = {
 //private
 
 function updateOffer(obj, res) {
-    db.Offer.update(
+    db.Offer.findOneAndUpdate(
         { homeId: obj.homeId, userId: new ObjectId(obj.userId) },
         {
             $set: { ...obj }
