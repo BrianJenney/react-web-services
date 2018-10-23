@@ -65,9 +65,10 @@ module.exports = {
     },
 
     //  LISTINGS BY USER
-    getListingsByUser: (req, res) => {
-        const user = db.User.find({ email: req.params.email });
-        db.Property.find({ userId: user.id })
+    getListingsByUser: async (req, res) => {
+        const user = await db.User.find({ email: req.params.email });
+        console.log(user);
+        db.Property.find({ userId: user[0]._id })
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
     },

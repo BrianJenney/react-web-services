@@ -78,7 +78,10 @@ module.exports = {
             res.json({ message: "offer already sent" });
         } else {
             db.Offer.update(
-                { userId: new ObjectId(req.body.userId), homeId: home._id },
+                {
+                    userId: new ObjectId(req.body.userId),
+                    homeId: req.body.homeId
+                },
                 {
                     $set: { readyToSend: true }
                 },
