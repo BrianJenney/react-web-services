@@ -15,6 +15,8 @@ cloudinary.config({
         : require("../config.js").cloudinary_secret
 });
 
+//TODO: fix register to return JWT and userinfo object
+
 module.exports = {
     login: (req, res) => {
         db.User.findOne({ email: req.body.email }).then(user => {

@@ -198,6 +198,19 @@ module.exports = {
         })
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
+    },
+
+    // GET OFFER INFO BY ID WITH HOUSE
+    offerInfo: async (req, res) => {
+        const offer = await db.Offer.findOne({
+            _id: new ObjectId(req.params.offer_id)
+        });
+
+        const home = await db.Property.findOne({
+            _id: new ObjectId(offer.homeId)
+        });
+
+        res.json({ offer, home });
     }
 };
 
