@@ -88,14 +88,15 @@ module.exports = {
             });
         }
 
-        db.User.update(
+        db.User.findOneAndUpdate(
             { email: req.body.userEmail },
             {
                 $set: {
                     phoneNumber: req.body.phoneNumber,
                     userPic: imgUrl
                 }
-            }
+            },
+            { new: true }
         )
             .then(doc => res.json(doc))
             .catch(err => res.json(err));

@@ -209,7 +209,7 @@ function updateOffer(obj, res) {
         {
             $set: { ...obj }
         },
-        { upsert: true }
+        { upsert: true, new: true }
     )
         .then(doc => res.json(doc))
         .catch(err => res.json(err));

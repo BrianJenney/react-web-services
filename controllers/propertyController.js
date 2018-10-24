@@ -76,25 +76,20 @@ module.exports = {
     // UPLOAD PROPERTY DISCLOSURE
     uploadDisclosure: async (req, res) => {
         let imgUrl;
+        const user = await db.User.find({ email: req.body.userEmail });
 
-        await cloudinary.uploader
-            .upload(req.files.file.path, { resource_type: "raw" }, function(
-                error,
-                result
-            ) {
-                console.log(result, error);
-            })
-            .catch(e => {
-                console.log(e);
-            });
+        await cloudinary.uploader.upload(req.files.file.path, result => {
+            imgUrl = result.url;
+        });
 
-        db.Property.update(
-            { email: req.body.userEmail },
+        db.Property.findOneAndUpdate(
+            { userid: user[0]._id },
             {
                 $set: {
                     disclosureAgreement: imgUrl
                 }
-            }
+            },
+            { new: true }
         )
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
@@ -102,10 +97,15 @@ module.exports = {
 
     // LISTING BY ID OR EMAIL
     houseInfo: async (req, res) => {
+        let owner;
         const isEmail = req.params.id.includes("@");
 
+        if (isEmail) {
+            owner = await db.User.find({ email: req.params.id });
+        }
+
         const query = isEmail
-            ? { email: req.params.id }
+            ? { userid: owner[0]._id }
             : { _id: new ObjectId(req.params.id) };
 
         const doc = await db.Property.find(query);
@@ -116,7 +116,7 @@ module.exports = {
         res.json({
             doc,
             monthly,
-            user: user[0]
+            user: user
         });
     },
 
