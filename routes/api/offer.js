@@ -7,7 +7,9 @@ router.route("/getoffer/:home_id").get(offerController.getOffers);
 
 router.route("/makeoffer").post(multipartMiddleware, offerController.makeOffer);
 
-router.route("/offerinfo").post(offerController.getOffersByuser);
+router.route("/offerinfo").post(offerController.getOffersByUserAndHome);
+
+router.route("/useroffers/:user_id").get(offerController.getOffersByuser);
 
 router.route("/getoffers").post(offerController.getOffers);
 

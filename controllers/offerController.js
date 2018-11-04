@@ -191,10 +191,19 @@ module.exports = {
     },
 
     // GET OFFER INFO BY USER AND HOME
-    getOffersByuser: (req, res) => {
+    getOffersByUserAndHome: (req, res) => {
         db.Offer.find({
             homeId: req.body.homeId,
             userId: req.body.userId
+        })
+            .then(doc => res.json(doc))
+            .catch(err => res.json(err));
+    },
+
+    // GET OFFER INFO BY USER
+    getOffersByuser: (req, res) => {
+        db.Offer.find({
+            userId: req.params.user_id
         })
             .then(doc => res.json(doc))
             .catch(err => res.json(err));

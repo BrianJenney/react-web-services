@@ -76,14 +76,14 @@ module.exports = {
     // UPLOAD PROPERTY DISCLOSURE
     uploadDisclosure: async (req, res) => {
         let imgUrl;
-        const user = await db.User.find({ email: req.body.userEmail });
+        const user = await db.User.findOne({ email: req.body.userEmail });
 
         await cloudinary.uploader.upload(req.files.file.path, result => {
             imgUrl = result.url;
         });
 
         db.Property.findOneAndUpdate(
-            { userid: user[0]._id },
+            { userid: user._id },
             {
                 $set: {
                     disclosureAgreement: imgUrl
@@ -101,17 +101,17 @@ module.exports = {
         const isEmail = req.params.id.includes("@");
 
         if (isEmail) {
-            owner = await db.User.find({ email: req.params.id });
+            owner = await db.User.findOne({ email: req.params.id });
         }
 
         const query = isEmail
-            ? { userid: owner[0]._id }
+            ? { userid: owner._id }
             : { _id: new ObjectId(req.params.id) };
 
-        const doc = await db.Property.find(query);
+        const doc = await db.Property.findOne(query);
 
-        const monthly = doc.length ? getMortgage(doc[0].price) : 0;
-        const user = doc.length ? await getUserEmail(doc[0].userid) : [];
+        const monthly = doc.length ? getMortgage(doc.price) : 0;
+        const user = doc.length ? await getUserEmail(doc.userid) : [];
 
         res.json({
             doc,
