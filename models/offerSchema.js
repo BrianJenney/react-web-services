@@ -20,7 +20,7 @@ const OfferSchema = new Schema({
         required: false
     },
     homeId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         required: true
     },
     additionalDocs: [

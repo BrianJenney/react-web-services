@@ -34,7 +34,7 @@ module.exports = {
 
                     const updateObj = {
                         [typeOfFile]: result.url,
-                        homeId: req.body.homeId,
+                        homeId: new ObjectId(req.body.homeId),
                         userId: new ObjectId(req.body.userId)
                     };
 
@@ -46,7 +46,7 @@ module.exports = {
         } else {
             updateOffer(
                 {
-                    homeId: req.body.homeId,
+                    homeId: new ObjectId(req.body.homeId),
                     userId: new ObjectId(req.body.userId),
                     offer: req.body.offer
                 },
@@ -59,28 +59,28 @@ module.exports = {
 
     // SUBMIT OFFER
     submitOffer: async (req, res) => {
-        const home = await db.Property.find({
+        const home = await db.Property.findOne({
             _id: new ObjectId(req.body.homeId)
         });
-        const recipient = await db.User.find({
-            _id: new ObjectId(home[0].userid)
+        const recipient = await db.User.findOne({
+            _id: new ObjectId(home.userid)
         });
-        const sender = await db.User.find({
+        const sender = await db.User.findOne({
             _id: new ObjectId(req.body.userId)
         });
 
-        const offer = await db.Offer.find({
+        const offer = await db.Offer.findOne({
             userId: new ObjectId(req.body.userId),
-            homeId: home[0]._id
+            homeId: home._id
         });
 
-        if (offer.length && offer[0].readyToSend) {
+        if (offer && offer.readyToSend) {
             res.json({ message: "offer already sent" });
         } else {
             db.Offer.update(
                 {
                     userId: new ObjectId(req.body.userId),
-                    homeId: req.body.homeId
+                    homeId: new ObjectId(req.body.homeId)
                 },
                 {
                     $set: { readyToSend: true }
@@ -89,11 +89,11 @@ module.exports = {
             )
                 .then(() => {
                     const mailer = new Mailer(
-                        recipient[0].email,
-                        sender[0].email,
+                        recipient.email,
+                        sender.email,
                         "Offer",
                         `<p>You have an offer on from ${
-                            sender[0].email
+                            sender.email
                         } on your property.</p> 
                         <p>Visit your <a href='localhost:3000/dashboard'>dashboard</a> to review this offer.</p>`,
                         res
@@ -108,15 +108,17 @@ module.exports = {
     acceptOffer: async (req, res) => {
         const offer = req.body;
 
-        const recipient = await db.User.find({
+        const recipient = await db.User.findOne({
             _id: new ObjectId(offer.userId)
         });
 
-        const home = await db.Property.find({
+        const home = await db.Property.findOne({
             _id: new ObjectId(offer.homeId)
         });
 
-        const offersForHome = await db.Offer.find({ homeId: offer.homeId });
+        const offersForHome = await db.Offer.findOne({
+            homeId: new ObjectId(offer.homeId)
+        });
 
         const hasOffer = offersForHome
             .map(offer => {
@@ -133,7 +135,7 @@ module.exports = {
         } else {
             updateOffer(
                 {
-                    homeId: offer.homeId,
+                    homeId: new ObjectId(offer.homeId),
                     userId: new ObjectId(offer.userId),
                     accepted: true,
                     acceptedDate: Date.now()
@@ -142,15 +144,15 @@ module.exports = {
             );
 
             const sender = await db.User.find({
-                _id: new ObjectId(home[0].userid)
+                _id: new ObjectId(home.userid)
             });
 
             const mailer = new Mailer(
-                recipient[0].email,
-                sender[0].email,
+                recipient.email,
+                sender.email,
                 "Offer Accepted",
                 `<p>Your offer on the property, ${
-                    home[0].address
+                    home.address
                 } has been accepted!</p> 
                     <p>Visit TBD <a href='localhost:3000/dashboard'>dashboard</a> for the next steps.</p>`,
                 res
@@ -162,11 +164,11 @@ module.exports = {
     // GET ALL OFFERS BELONGING TO A SELLER
     getOffers: async (req, res) => {
         const homes = await db.Property.find({
-            userid: req.body.userId
+            userid: new ObjectId(req.body.userId)
         });
 
         const homeIds = homes.map(home => {
-            return `${home._id}`;
+            return new ObjectId(`${home._id}`);
         });
 
         db.Offer.aggregate([
@@ -202,9 +204,21 @@ module.exports = {
 
     // GET OFFER INFO BY USER
     getOffersByuser: (req, res) => {
-        db.Offer.find({
-            userId: req.params.user_id
-        })
+        db.Offer.aggregate([
+            {
+                $match: {
+                    userId: new ObjectId(req.params.user_id)
+                }
+            },
+            {
+                $lookup: {
+                    from: "properties",
+                    localField: "homeId",
+                    foreignField: "_id",
+                    as: "home"
+                }
+            }
+        ])
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
     },
