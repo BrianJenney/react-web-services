@@ -1,6 +1,6 @@
 const db = require("../models");
 const axios = require("axios");
-const cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary").v2;
 const ObjectId = require("mongodb").ObjectID;
 const geoKey = process.env.NODE_ENV
     ? process.env.geoapi
@@ -26,9 +26,13 @@ module.exports = {
 
         req.files.file.map(file => {
             promises.push(
-                cloudinary.uploader.upload(file.path, function(result) {
-                    imgUrl.push(result.url);
-                })
+                cloudinary.uploader.upload(
+                    file.path,
+                    { resource_type: "auto" },
+                    function(result) {
+                        imgUrl.push(result.url);
+                    }
+                )
             );
         });
 

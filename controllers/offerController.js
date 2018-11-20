@@ -1,6 +1,6 @@
 const db = require("../models");
 const axios = require("axios");
-const cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary").v2;
 const ObjectId = require("mongodb").ObjectID;
 const geoKey = process.env.NODE_ENV
     ? process.env.geoapi
@@ -25,21 +25,25 @@ module.exports = {
         let imgUrl;
         if (req.files) {
             await cloudinary.uploader
-                .upload(req.files.file.path, function(result, error) {
-                    const isPurchaseDoc = req.body.isPurchaseDoc === "true";
+                .upload(
+                    req.files.file.path,
+                    { resource_type: "auto" },
+                    function(error, result) {
+                        const isPurchaseDoc = req.body.isPurchaseDoc === "true";
 
-                    const typeOfFile = isPurchaseDoc
-                        ? "purchaseAgreement"
-                        : "loanDocument";
+                        const typeOfFile = isPurchaseDoc
+                            ? "purchaseAgreement"
+                            : "loanDocument";
 
-                    const updateObj = {
-                        [typeOfFile]: result.url,
-                        homeId: new ObjectId(req.body.homeId),
-                        userId: new ObjectId(req.body.userId)
-                    };
+                        const updateObj = {
+                            [typeOfFile]: result.url,
+                            homeId: new ObjectId(req.body.homeId),
+                            userId: new ObjectId(req.body.userId)
+                        };
 
-                    updateOffer(updateObj, res);
-                })
+                        updateOffer(updateObj, res);
+                    }
+                )
                 .catch(error => {
                     handleError(error, res);
                 });

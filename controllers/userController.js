@@ -1,6 +1,6 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
-const cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary").v2;
 const ObjectId = require("mongodb").ObjectID;
 
 cloudinary.config({
