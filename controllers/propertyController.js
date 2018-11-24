@@ -1,6 +1,6 @@
 const db = require("../models");
 const axios = require("axios");
-const cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary").v2;
 const ObjectId = require("mongodb").ObjectID;
 const geoKey = process.env.NODE_ENV
     ? process.env.geoapi
@@ -26,9 +26,13 @@ module.exports = {
 
         req.files.file.map(file => {
             promises.push(
-                cloudinary.uploader.upload(file.path, function(result) {
-                    imgUrl.push(result.url);
-                })
+                cloudinary.uploader.upload(
+                    file.path,
+                    { resource_type: "auto" },
+                    function(result) {
+                        imgUrl.push(result.url);
+                    }
+                )
             );
         });
 
@@ -65,24 +69,58 @@ module.exports = {
     },
 
     //  LISTINGS BY USER
-    getListingsByUser: (req, res) => {
-        db.Property.find({ userEmail: req.params.email })
+    getListingsByUser: async (req, res) => {
+        const user = await db.User.find({ email: req.params.email });
+
+        db.Property.find({ userid: user[0]._id })
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
     },
 
-    // LISTING BY ID
-    houseInfo: async (req, res) => {
-        const doc = await db.Property.find({
-            _id: new ObjectId(req.params.id)
+    // UPLOAD PROPERTY DISCLOSURE
+    uploadDisclosure: async (req, res) => {
+        let imgUrl;
+        const user = await db.User.findOne({ email: req.body.userEmail });
+
+        await cloudinary.uploader.upload(req.files.file.path, result => {
+            imgUrl = result.url;
         });
-        const monthly = getMortgage(doc[0].price);
-        const user = await getUserEmail(doc[0].userid);
+
+        db.Property.findOneAndUpdate(
+            { userid: user._id },
+            {
+                $set: {
+                    disclosureAgreement: imgUrl
+                }
+            },
+            { new: true }
+        )
+            .then(doc => res.json(doc))
+            .catch(err => res.json(err));
+    },
+
+    // LISTING BY ID OR EMAIL
+    houseInfo: async (req, res) => {
+        let owner;
+        const isEmail = req.params.id.includes("@");
+
+        if (isEmail) {
+            owner = await db.User.findOne({ email: req.params.id });
+        }
+
+        const query = isEmail
+            ? { userid: owner._id }
+            : { _id: new ObjectId(req.params.id) };
+
+        const doc = await db.Property.findOne(query);
+
+        const monthly = doc.length ? getMortgage(doc.price) : 0;
+        const user = doc.length ? await getUserEmail(doc.userid) : [];
 
         res.json({
             doc,
             monthly,
-            user: user[0]
+            user: user
         });
     },
 
@@ -135,7 +173,7 @@ buildQuery = async params => {
             ];
         });
         andClauses.push({
-            location: { $near: [lon, lat], $maxDistance: 10 / 10 }
+            location: { $near: [lon, lat], $maxDistance: 0.25 }
         });
     }
     if (params.hasOwnProperty("bedRooms")) {

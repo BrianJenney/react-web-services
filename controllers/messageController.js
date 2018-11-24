@@ -26,7 +26,7 @@ module.exports = {
     //set message to viewed
     viewMessage: async (req, res) => {
         db.Messages.update(
-            { "messages._id": ObjectId(req.body.messageId) },
+            { "messages._id": new ObjectId(req.body.messageId) },
             { $set: { "messages.$.viewed": true } }
         )
             .then(doc => res.json(doc))
