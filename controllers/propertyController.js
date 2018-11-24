@@ -173,7 +173,7 @@ buildQuery = async params => {
             ];
         });
         andClauses.push({
-            location: { $near: [lon, lat], $maxDistance: 10 / 10 }
+            location: { $near: [lon, lat], $maxDistance: 0.25 }
         });
     }
     if (params.hasOwnProperty("bedRooms")) {
