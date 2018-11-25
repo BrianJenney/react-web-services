@@ -197,7 +197,7 @@ buildQuery = async params => {
     }
 
     if (params.hasOwnProperty("propertyType")) {
-        if (params.propertyType !== null) {
+        if (params.propertyType !== null && params.propertyType.length) {
             andClauses.push({ propertyType: params.propertyType });
         }
     }
