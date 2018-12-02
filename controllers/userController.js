@@ -67,9 +67,12 @@ module.exports = {
         let imgUrl;
 
         if (hasFile) {
-            await cloudinary.uploader.upload(req.files.file.path, result => {
-                imgUrl = result.url;
-            });
+            await cloudinary.uploader.upload(
+                req.files.file.path,
+                (err, result) => {
+                    imgUrl = result.url;
+                }
+            );
         }
 
         db.User.findOneAndUpdate(
