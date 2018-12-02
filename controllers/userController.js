@@ -54,6 +54,8 @@ module.exports = {
         //  hash password
         newUser.password = newUser.generateHash(req.body.password);
 
+        console.log("here about to save user");
+
         newUser.save().then(user => {
             sendJwt(user, res);
         });
