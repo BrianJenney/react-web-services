@@ -54,11 +54,12 @@ module.exports = {
         //  hash password
         newUser.password = newUser.generateHash(req.body.password);
 
-        console.log("here about to save user");
-
-        newUser.save().then(user => {
-            sendJwt(user, res);
-        });
+        newUser
+            .save()
+            .then(user => {
+                sendJwt(user, res);
+            })
+            .catch(err => res.json(err));
     },
 
     updateProfile: async (req, res) => {

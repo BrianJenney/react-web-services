@@ -59,8 +59,7 @@ const UserSchema = new Schema({
 
 // hash the password
 UserSchema.methods.generateHash = function(password) {
-    console.log("hashing password");
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(16), null);
 };
 
 // checking if password is valid
