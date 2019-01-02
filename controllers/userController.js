@@ -15,8 +15,6 @@ cloudinary.config({
         : require("../config.js").cloudinary_secret
 });
 
-//TODO: fix register to return JWT and userinfo object
-
 module.exports = {
     login: (req, res) => {
         db.User.findOne({ email: req.body.email }).then(user => {
@@ -44,14 +42,35 @@ module.exports = {
             .catch(err => res.json(err));
     },
 
-    register: (req, res) => {
+    register: async (req, res) => {
+        const hasFile = Object.keys(req.files).length;
+        let imgUrl;
+
+        if (hasFile) {
+            await cloudinary.uploader.upload(
+                req.files.file.path,
+                (err, result) => {
+                    imgUrl = result.url;
+                }
+            );
+        }
+        const {
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            password,
+            userType
+        } = req;
         let newUser = db.User({
-            income: req.body.income,
-            SSN: req.body.SSN,
-            userType: req.body.userType,
-            email: req.body.email
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            password,
+            userPic: imgUrl
         });
-        //  hash password
+
         newUser.password = newUser.generateHash(req.body.password);
 
         newUser

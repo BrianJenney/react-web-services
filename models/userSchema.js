@@ -30,27 +30,19 @@ const UserSchema = new Schema({
         type: String,
         trim: true
     },
-    userName: {
+    firstName: {
         type: String,
         trim: true,
         unique: true
     },
-    income: {
-        type: Number
-    },
-    SSN: {
-        type: Number,
+    lastName: {
+        type: String,
+        trim: true,
         unique: true
     },
     userType: {
         type: String
     },
-    liked: [
-        {
-            type: String
-        }
-    ],
-    // This will make a userCreated entry in our doc, by default the current time string.
     userCreated: {
         type: Date,
         default: Date.now
