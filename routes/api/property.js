@@ -6,7 +6,7 @@ const multipartMiddleware = multipart();
 
 router.route("/upload").post(multipartMiddleware, propertyController.upload);
 
-router.route("/getlistings/:userid").get(propertyController.getListings);
+router.route("/properties").get(propertyController.getListings);
 
 router
     .route("/getlistingsbyuser/:email")

@@ -23,8 +23,8 @@ const UserSchema = new Schema({
     },
     phoneNumber: {
         type: String,
-        trim: true,
-        match: [/\d/g.length === 10, "Please enter a valid phone number"]
+        trim: true
+        // match: [/\d/g.length === 10, "Please enter a valid phone number"]
     },
     userPic: {
         type: String,

@@ -61,7 +61,7 @@ module.exports = {
             phoneNumber,
             password,
             userType
-        } = req;
+        } = req.body;
         let newUser = db.User({
             firstName,
             lastName,
@@ -71,7 +71,10 @@ module.exports = {
             userPic: imgUrl
         });
 
-        newUser.password = newUser.generateHash(req.body.password);
+        newUser.password = newUser.generateHash(password);
+
+        const errorObject = { success: false };
+        const successObject = { success: true };
 
         newUser
             .save()
