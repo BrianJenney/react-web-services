@@ -4,7 +4,13 @@ const propertyController = require("../../controllers/propertyController");
 const multipart = require("connect-multiparty");
 const multipartMiddleware = multipart();
 
-router.route("/upload").post(multipartMiddleware, propertyController.upload);
+router
+    .route("/upload")
+    .post(multipartMiddleware, propertyController.createProperty);
+
+router
+    .route("/edit")
+    .post(multipartMiddleware, propertyController.editProperty);
 
 router.route("/properties").get(propertyController.getListings);
 
@@ -18,6 +24,6 @@ router.route("/info/:id").get(propertyController.houseInfo);
 
 router
     .route("/disclosure")
-    .post(multipartMiddleware, propertyController.uploadDisclosure);
+    .post(multipartMiddleware, propertyController.uploadDocument);
 
 module.exports = router;

@@ -31,6 +31,30 @@ const PropertySchema = new Schema({
         type: String,
         required: false
     },
+    transferDisclosure: {
+        type: String,
+        required: false
+    },
+    leadPaintDisclosure: {
+        type: String,
+        required: false
+    },
+    naturalHazardDisclosure: {
+        type: String,
+        required: false
+    },
+    sellerQuestionaire: {
+        type: String,
+        required: false
+    },
+    statewideAdvisory: {
+        type: String,
+        required: false
+    },
+    supplementalQuestionaire: {
+        type: String,
+        required: false
+    },
     address: {
         type: String,
         required: true

@@ -18,9 +18,18 @@ cloudinary.config({
         : require("../config.js").cloudinary_secret
 });
 
+const DOCUMENT_ENUM = [
+    "transferDisclosure",
+    "leadPaintDisclosure",
+    "naturalHazardDisclosure",
+    "sellerQuestionaire",
+    "statewideAdvisory",
+    "supplementalQuestionaire"
+];
+
 module.exports = {
-    //  UPLOAD HOUSING DATA
-    upload: async (req, res) => {
+    //  UPLOAD A PROPERTY
+    createProperty: async (req, res) => {
         let imgUrl = [],
             promises = [];
 
@@ -57,6 +66,9 @@ module.exports = {
         });
     },
 
+    //EDIT A PROPERTY
+    editProperty: async (req, res) => {},
+
     //  GET ALL LISTINGS
     getListings: (req, res) => {
         db.Property.find({})
@@ -73,26 +85,32 @@ module.exports = {
             .catch(err => res.json(err));
     },
 
-    // UPLOAD PROPERTY DISCLOSURE
-    uploadDisclosure: async (req, res) => {
+    // UPLOAD DOCUMENTS TO SELL PROPERTY
+    uploadDocument: async (req, res) => {
         let imgUrl;
         const user = await db.User.findOne({ email: req.body.userEmail });
 
-        await cloudinary.uploader.upload(req.files.file.path, result => {
-            imgUrl = result.url;
-        });
+        const { documentType } = req.body;
 
-        db.Property.findOneAndUpdate(
-            { userid: user._id },
-            {
-                $set: {
-                    disclosureAgreement: imgUrl
-                }
-            },
-            { new: true }
-        )
-            .then(doc => res.json(doc))
-            .catch(err => res.json(err));
+        if (DOCUMENT_ENUM.includes(documentType)) {
+            await cloudinary.uploader.upload(req.files.file.path, result => {
+                imgUrl = result.url;
+            });
+
+            db.Property.findOneAndUpdate(
+                { userid: user._id },
+                {
+                    $set: {
+                        [documentType]: imgUrl
+                    }
+                },
+                { new: true }
+            )
+                .then(doc => res.json(doc))
+                .catch(err => res.json(err));
+        } else {
+            res.json({ error: "file type not supported" });
+        }
     },
 
     // LISTING BY ID OR EMAIL
@@ -110,8 +128,8 @@ module.exports = {
 
         const doc = await db.Property.findOne(query);
 
-        const monthly = doc.length ? getMortgage(doc.price) : 0;
-        const user = doc.length ? await getUserEmail(doc.userid) : [];
+        const monthly = doc && doc.length ? getMortgage(doc.price) : 0;
+        const user = doc && doc.length ? await getUserEmail(doc.userid) : [];
 
         res.json({
             doc,
@@ -219,11 +237,11 @@ getMortgage = price => {
     return monthlyPayment(principle, numberOfPayments, interest);
 };
 
-function monthlyPayment(principle, numberOfPayments, interest) {
+monthlyPayment = (principle, numberOfPayments, interest) => {
     return Math.round(
         principle *
             interest *
             Math.pow(1 + interest, numberOfPayments) /
             (Math.pow(1 + interest, numberOfPayments) - 1)
     );
-}
+};
