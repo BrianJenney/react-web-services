@@ -27,6 +27,13 @@ const DOCUMENT_ENUM = [
     "supplementalQuestionaire"
 ];
 
+const getAddress = async address => {
+    const addressResponse = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${geoKey}`
+    );
+    return addressResponse;
+};
+
 module.exports = {
     //  UPLOAD A PROPERTY
     createProperty: async (req, res) => {
@@ -40,34 +47,89 @@ module.exports = {
                 })
             );
         });
-
+        const addressResponse = await getAddress(req.body.address);
         Promise.all(promises).then(() => {
-            axios
-                .get(
-                    `https://maps.googleapis.com/maps/api/geocode/json?address=${
-                        req.body.address
-                    }&key=${geoKey}`
-                )
-                .then(resp => {
-                    req.body.location = [
-                        resp.data.results[0].geometry.location.lng,
-                        resp.data.results[0].geometry.location.lat
-                    ];
-                    req.body.imgs = imgUrl;
-                })
-                .then(() => {
-                    if (Object.keys(req.body).length === 0) {
-                        return;
-                    }
-                    db.Property.create(req.body)
-                        .then(doc => res.json(doc))
-                        .catch(err => res.json(err));
-                });
+            req.body.location = [
+                addressResponse.data.results[0].geometry.location.lng,
+                addressResponse.data.results[0].geometry.location.lat
+            ];
+            req.body.imgs = imgUrl;
+            if (Object.keys(req.body).length === 0) {
+                return;
+            }
+            db.Property.create(req.body)
+                .then(doc => res.json(doc))
+                .catch(err => res.json(err));
         });
     },
 
     //EDIT A PROPERTY
-    editProperty: async (req, res) => {},
+    editProperty: async (req, res) => {
+        //get property
+        const {
+            homeId,
+            imgsToDelete,
+            email,
+            userid,
+            price,
+            propertyType,
+            description,
+            bedRooms,
+            bathRooms,
+            yearBuilt,
+            sqFeetLot,
+            sqFeet
+        } = req.body;
+
+        const home = await db.Property.findOne({ _id: new ObjectId(homeId) });
+
+        const currentImages = home.imgs;
+
+        const addressResponse = await getAddress(req.body.address);
+
+        let newImages = currentImages.filter(img => {
+            return !imagesToDelete.includes(img);
+        });
+
+        let imgUrls = [],
+            promises = [];
+
+        req.files.file.map(file => {
+            promises.push(
+                cloudinary.uploader.upload(file.path, result => {
+                    imgUrls.push(result.url);
+                })
+            );
+        });
+
+        Promise.all(promises).then(() => {
+            newImages.concat(imgUrl);
+        });
+
+        db.Property.findOneAndUpdate(
+            { _id: new ObjectId(homeId) },
+            {
+                $set: {
+                    imgs: newImages,
+                    location: [
+                        addressResponse.data.results[0].geometry.location.lng,
+                        addressResponse.data.results[0].geometry.location.lat
+                    ],
+                    price,
+                    propertyType,
+                    description,
+                    bedRooms,
+                    bathRooms,
+                    yearBuilt,
+                    sqFeetLot,
+                    sqFeet
+                }
+            },
+            { new: true }
+        )
+            .then(doc => res.json(doc))
+            .catch(err => res.json(err));
+    },
 
     //  GET ALL LISTINGS
     getListings: (req, res) => {
