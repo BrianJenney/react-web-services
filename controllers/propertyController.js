@@ -65,8 +65,8 @@ module.exports = {
 
     //EDIT A PROPERTY
     editProperty: async (req, res) => {
-        //get property
         const {
+            address,
             homeId,
             imgsToDelete,
             email,
@@ -82,53 +82,59 @@ module.exports = {
         } = req.body;
 
         const home = await db.Property.findOne({ _id: new ObjectId(homeId) });
-
         const currentImages = home.imgs;
-
-        const addressResponse = await getAddress(req.body.address);
+        const addressResponse = await getAddress(address);
 
         let newImages = currentImages.filter(img => {
-            return !imagesToDelete.includes(img);
+            return !(imgsToDelete || []).includes(img);
         });
 
         let imgUrls = [],
             promises = [];
 
-        req.files.file.map(file => {
-            promises.push(
-                cloudinary.uploader.upload(file.path, result => {
-                    imgUrls.push(result.url);
-                })
-            );
-        });
+        const hasFile = Object.keys(req.files).length;
 
-        Promise.all(promises).then(() => {
-            newImages.concat(imgUrl);
-        });
+        if (hasFile) {
+            const files = req.files.file.isArray
+                ? req.files.file
+                : [req.files.file];
+            files.map(file => {
+                promises.push(
+                    cloudinary.uploader.upload(file.path, result => {
+                        imgUrls.push(result.url);
+                    })
+                );
+            });
+        }
 
-        db.Property.findOneAndUpdate(
-            { _id: new ObjectId(homeId) },
-            {
-                $set: {
-                    imgs: newImages,
-                    location: [
-                        addressResponse.data.results[0].geometry.location.lng,
-                        addressResponse.data.results[0].geometry.location.lat
-                    ],
-                    price,
-                    propertyType,
-                    description,
-                    bedRooms,
-                    bathRooms,
-                    yearBuilt,
-                    sqFeetLot,
-                    sqFeet
-                }
-            },
-            { new: true }
-        )
-            .then(doc => res.json(doc))
-            .catch(err => res.json(err));
+        await Promise.all(promises).then(() => {
+            db.Property.findOneAndUpdate(
+                { _id: new ObjectId(homeId) },
+                {
+                    $set: {
+                        imgs: [...newImages, ...imgUrls],
+                        location: [
+                            addressResponse.data.results[0].geometry.location
+                                .lng,
+                            addressResponse.data.results[0].geometry.location
+                                .lat
+                        ],
+                        address,
+                        price,
+                        propertyType,
+                        description,
+                        bedRooms,
+                        bathRooms,
+                        yearBuilt,
+                        sqFeetLot,
+                        sqFeet
+                    }
+                },
+                { new: true }
+            )
+                .then(doc => res.json(doc))
+                .catch(err => res.json(err));
+        });
     },
 
     //  GET ALL LISTINGS
