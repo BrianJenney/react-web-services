@@ -29,16 +29,11 @@ module.exports = {
                     req.files.file.path,
                     { resource_type: "auto" },
                     function(error, result) {
-                        const isPurchaseDoc = req.body.isPurchaseDoc === "true";
-
-                        const typeOfFile = isPurchaseDoc
-                            ? "purchaseAgreement"
-                            : "loanDocument";
-
+                        const { homeId, userId, documentType } = req.body;
                         const updateObj = {
-                            [typeOfFile]: result.url,
-                            homeId: new ObjectId(req.body.homeId),
-                            userId: new ObjectId(req.body.userId)
+                            [documentType]: result.url,
+                            homeId: new ObjectId(homeId),
+                            userId: new ObjectId(userId)
                         };
 
                         updateOffer(updateObj, res);
@@ -197,11 +192,26 @@ module.exports = {
     },
 
     // GET OFFER INFO BY USER AND HOME
-    getOffersByUserAndHome: (req, res) => {
-        db.Offer.find({
-            homeId: req.body.homeId,
-            userId: req.body.userId
-        })
+    getOffersByUserAndHome: async (req, res) => {
+        const homes = await db.Property.find({
+            userid: new ObjectId(req.body.userId)
+        });
+
+        db.Offer.aggregate([
+            {
+                $match: {
+                    homeId: new ObjectId(req.body.homeId)
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "users"
+                }
+            }
+        ])
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
     },
