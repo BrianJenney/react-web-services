@@ -196,8 +196,8 @@ module.exports = {
 
         const doc = await db.Property.findOne(query);
 
-        const monthly = doc && doc.length ? getMortgage(doc.price) : 0;
-        const user = doc && doc.length ? await getUserEmail(doc.userid) : [];
+        const monthly = doc ? getMortgage(doc.price) : 0;
+        const user = doc ? await getUserEmail(doc.userid) : [];
 
         res.json({
             doc,
@@ -294,7 +294,7 @@ getLonLat = address => {
 };
 
 getUserEmail = userId => {
-    return db.User.find({ _id: new ObjectId(userId) });
+    return db.User.findOne({ _id: new ObjectId(userId) });
 };
 
 getMortgage = price => {
