@@ -115,7 +115,7 @@ module.exports = {
             _id: new ObjectId(offer.homeId)
         });
 
-        const offersForHome = await db.Offer.findOne({
+        const offersForHome = await db.Offer.find({
             homeId: new ObjectId(offer.homeId)
         });
 
