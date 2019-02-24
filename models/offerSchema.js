@@ -47,6 +47,9 @@ const OfferSchema = new Schema({
     },
     acceptedDate: {
         type: Date
+    },
+    sellerPurchaseAgreement: {
+        type: String
     }
 });
 

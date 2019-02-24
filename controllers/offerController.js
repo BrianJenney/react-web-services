@@ -25,20 +25,20 @@ module.exports = {
         let imgUrl;
         if (req.files) {
             await cloudinary.uploader
-                .upload(
-                    req.files.file.path,
-                    { resource_type: "auto" },
-                    function(error, result) {
-                        const { homeId, userId, documentType } = req.body;
-                        const updateObj = {
-                            [documentType]: result.url,
-                            homeId: new ObjectId(homeId),
-                            userId: new ObjectId(userId)
-                        };
+                .upload(req.files.file.path, (error, result) => {
+                    const { homeId, userId, documentType } = req.body;
+                    const updateObj = {
+                        [documentType]: result.url,
+                        homeId: new ObjectId(homeId),
+                        userId: new ObjectId(userId)
+                    };
 
-                        updateOffer(updateObj, res);
+                    if (documentType === "sellerPurchaseAgreement") {
+                        sendSellerSignedPurchaseAgreementMail(updateObj);
                     }
-                )
+
+                    updateOffer(updateObj, res);
+                })
                 .catch(error => {
                     handleError(error, res);
                 });
@@ -253,7 +253,7 @@ module.exports = {
 
 //private
 
-function updateOffer(obj, res) {
+async function updateOffer(obj, res) {
     db.Offer.findOneAndUpdate(
         { homeId: obj.homeId, userId: new ObjectId(obj.userId) },
         {
@@ -261,8 +261,37 @@ function updateOffer(obj, res) {
         },
         { upsert: true, new: true }
     )
-        .then(doc => res.json(doc))
+        .then(doc => {
+            sendSigned;
+            res.json(doc);
+        })
         .catch(err => res.json(err));
+}
+
+async function sendSellerSignedPurchaseAgreementMail(offer) {
+    const recipient = await db.User.findOne({
+        _id: new ObjectId(offer.userId)
+    });
+
+    const home = await db.Property.findOne({
+        _id: new ObjectId(offer.homeId)
+    });
+
+    const sender = await db.User.find({
+        _id: new ObjectId(home.userid)
+    });
+
+    const mailer = new Mailer(
+        recipient.email,
+        sender.email,
+        "Purchase Agreement Signed",
+        `<p>The seller ${
+            recipient.firstName
+        } has signed your purchase agreement!</p> 
+        <p>Visit TBD <a href='localhost:3000/dashboard'>dashboard</a> for the next steps.</p>`,
+        res
+    );
+    mailer.sendMail();
 }
 
 function handleError(e, res) {
