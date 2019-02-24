@@ -94,10 +94,10 @@ module.exports = {
                         `<p>You have an offer on from ${
                             sender.email
                         } on your property.</p> 
-                        <p>Visit your <a href='localhost:3000/dashboard'>dashboard</a> to review this offer.</p>`,
-                        res
+                        <p>Visit your <a href='localhost:3000/dashboard'>dashboard</a> to review this offer.</p>`
                     );
                     mailer.sendMail();
+                    res.json({ ok: 200 });
                 })
                 .catch(err => res.json(err));
         }
@@ -262,7 +262,6 @@ async function updateOffer(obj, res) {
         { upsert: true, new: true }
     )
         .then(doc => {
-            sendSigned;
             res.json(doc);
         })
         .catch(err => res.json(err));
@@ -286,10 +285,11 @@ async function sendSellerSignedPurchaseAgreementMail(offer) {
         sender.email,
         "Purchase Agreement Signed",
         `<p>The seller ${
-            recipient.firstName
+            sender.firstName
         } has signed your purchase agreement!</p> 
-        <p>Visit TBD <a href='localhost:3000/dashboard'>dashboard</a> for the next steps.</p>`,
-        res
+        <p>Visit your <a href='localhost:3000/buyerdashboard/${
+            home._id
+        }'>dashboard</a> for the next steps.</p>`
     );
     mailer.sendMail();
 }

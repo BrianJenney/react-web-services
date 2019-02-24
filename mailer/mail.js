@@ -17,12 +17,11 @@ const transporter = nodemailer.createTransport({
 });
 
 class Mailer {
-    constructor(recipient, sender, subject, html, res) {
+    constructor(recipient, sender, subject, html) {
         this.recipient = recipient;
         this.sender = sender;
         this.subject = subject;
         this.html = html;
-        this.res = res;
         this.transporter = transporter;
     }
 
@@ -36,9 +35,7 @@ class Mailer {
 
         this.transporter.sendMail(mailOptions, (err, info) => {
             if (err) {
-                this.res.json(err);
-            } else {
-                this.res.json({ ok: 200 });
+                throw new Error("Message did not send");
             }
         });
     }
