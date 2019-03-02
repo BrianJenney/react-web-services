@@ -23,34 +23,26 @@ const UserSchema = new Schema({
     },
     phoneNumber: {
         type: String,
-        trim: true,
-        match: [/\d/g.length === 10, "Please enter a valid phone number"]
+        trim: true
+        // match: [/\d/g.length === 10, "Please enter a valid phone number"]
     },
     userPic: {
         type: String,
         trim: true
     },
-    userName: {
+    firstName: {
         type: String,
         trim: true,
         unique: true
     },
-    income: {
-        type: Number
-    },
-    SSN: {
-        type: Number,
+    lastName: {
+        type: String,
+        trim: true,
         unique: true
     },
     userType: {
         type: String
     },
-    liked: [
-        {
-            type: String
-        }
-    ],
-    // This will make a userCreated entry in our doc, by default the current time string.
     userCreated: {
         type: Date,
         default: Date.now
@@ -59,7 +51,7 @@ const UserSchema = new Schema({
 
 // hash the password
 UserSchema.methods.generateHash = function(password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(16), null);
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(5), null);
 };
 
 // checking if password is valid

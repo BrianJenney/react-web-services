@@ -18,9 +18,25 @@ cloudinary.config({
         : require("../config.js").cloudinary_secret
 });
 
+const DOCUMENT_ENUM = [
+    "transferDisclosure",
+    "leadPaintDisclosure",
+    "naturalHazardDisclosure",
+    "sellerQuestionaire",
+    "statewideAdvisory",
+    "supplementalQuestionaire"
+];
+
+const getAddress = async address => {
+    const addressResponse = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${geoKey}`
+    );
+    return addressResponse;
+};
+
 module.exports = {
-    //  UPLOAD HOUSING DATA
-    upload: async (req, res) => {
+    //  UPLOAD A PROPERTY
+    createProperty: async (req, res) => {
         let imgUrl = [],
             promises = [];
 
@@ -31,29 +47,93 @@ module.exports = {
                 })
             );
         });
-
+        const addressResponse = await getAddress(req.body.address);
         Promise.all(promises).then(() => {
-            axios
-                .get(
-                    `https://maps.googleapis.com/maps/api/geocode/json?address=${
-                        req.body.address
-                    }&key=${geoKey}`
-                )
-                .then(resp => {
-                    req.body.location = [
-                        resp.data.results[0].geometry.location.lng,
-                        resp.data.results[0].geometry.location.lat
-                    ];
-                    req.body.imgs = imgUrl;
-                })
-                .then(() => {
-                    if (Object.keys(req.body).length === 0) {
-                        return;
+            req.body.location = [
+                addressResponse.data.results[0].geometry.location.lng,
+                addressResponse.data.results[0].geometry.location.lat
+            ];
+            req.body.imgs = imgUrl;
+            if (Object.keys(req.body).length === 0) {
+                return;
+            }
+            db.Property.create(req.body)
+                .then(doc => res.json(doc))
+                .catch(err => res.json(err));
+        });
+    },
+
+    //EDIT A PROPERTY
+    editProperty: async (req, res) => {
+        const {
+            address,
+            homeId,
+            imgsToDelete,
+            email,
+            userid,
+            price,
+            propertyType,
+            description,
+            bedRooms,
+            bathRooms,
+            yearBuilt,
+            sqFeetLot,
+            sqFeet
+        } = req.body;
+
+        const home = await db.Property.findOne({ _id: new ObjectId(homeId) });
+        const currentImages = home.imgs;
+        const addressResponse = await getAddress(address);
+
+        let newImages = currentImages.filter(img => {
+            return !(imgsToDelete || []).includes(img);
+        });
+
+        let imgUrls = [],
+            promises = [];
+
+        const hasFile = Object.keys(req.files).length;
+
+        if (hasFile) {
+            const files = req.files.file.isArray
+                ? req.files.file
+                : [req.files.file];
+            files.map(file => {
+                promises.push(
+                    cloudinary.uploader.upload(file.path, result => {
+                        imgUrls.push(result.url);
+                    })
+                );
+            });
+        }
+
+        await Promise.all(promises).then(() => {
+            db.Property.findOneAndUpdate(
+                { _id: new ObjectId(homeId) },
+                {
+                    $set: {
+                        imgs: [...newImages, ...imgUrls],
+                        location: [
+                            addressResponse.data.results[0].geometry.location
+                                .lng,
+                            addressResponse.data.results[0].geometry.location
+                                .lat
+                        ],
+                        address,
+                        price,
+                        propertyType,
+                        description,
+                        bedRooms,
+                        bathRooms,
+                        yearBuilt,
+                        sqFeetLot,
+                        sqFeet
                     }
-                    db.Property.create(req.body)
-                        .then(doc => res.json(doc))
-                        .catch(err => res.json(err));
-                });
+                },
+                { new: true }
+            )
+                .then(doc => res.json(doc))
+                .catch(err => res.json(err));
         });
     },
 
@@ -73,26 +153,32 @@ module.exports = {
             .catch(err => res.json(err));
     },
 
-    // UPLOAD PROPERTY DISCLOSURE
-    uploadDisclosure: async (req, res) => {
+    // UPLOAD DOCUMENTS TO SELL PROPERTY
+    uploadDocument: async (req, res) => {
         let imgUrl;
         const user = await db.User.findOne({ email: req.body.userEmail });
 
-        await cloudinary.uploader.upload(req.files.file.path, result => {
-            imgUrl = result.url;
-        });
+        const { documentType } = req.body;
 
-        db.Property.findOneAndUpdate(
-            { userid: user._id },
-            {
-                $set: {
-                    disclosureAgreement: imgUrl
-                }
-            },
-            { new: true }
-        )
-            .then(doc => res.json(doc))
-            .catch(err => res.json(err));
+        if (DOCUMENT_ENUM.includes(documentType)) {
+            await cloudinary.uploader.upload(req.files.file.path, result => {
+                imgUrl = result.url;
+            });
+
+            db.Property.findOneAndUpdate(
+                { userid: user._id },
+                {
+                    $set: {
+                        [documentType]: imgUrl
+                    }
+                },
+                { new: true }
+            )
+                .then(doc => res.json(doc))
+                .catch(err => res.json(err));
+        } else {
+            res.json({ error: "file type not supported" });
+        }
     },
 
     // LISTING BY ID OR EMAIL
@@ -110,8 +196,8 @@ module.exports = {
 
         const doc = await db.Property.findOne(query);
 
-        const monthly = doc.length ? getMortgage(doc.price) : 0;
-        const user = doc.length ? await getUserEmail(doc.userid) : [];
+        const monthly = doc ? getMortgage(doc.price) : 0;
+        const user = doc ? await getUserEmail(doc.userid) : [];
 
         res.json({
             doc,
@@ -208,7 +294,7 @@ getLonLat = address => {
 };
 
 getUserEmail = userId => {
-    return db.User.find({ _id: new ObjectId(userId) });
+    return db.User.findOne({ _id: new ObjectId(userId) });
 };
 
 getMortgage = price => {
@@ -219,11 +305,11 @@ getMortgage = price => {
     return monthlyPayment(principle, numberOfPayments, interest);
 };
 
-function monthlyPayment(principle, numberOfPayments, interest) {
+monthlyPayment = (principle, numberOfPayments, interest) => {
     return Math.round(
         principle *
             interest *
             Math.pow(1 + interest, numberOfPayments) /
             (Math.pow(1 + interest, numberOfPayments) - 1)
     );
-}
+};

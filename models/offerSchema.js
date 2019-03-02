@@ -15,6 +15,10 @@ const OfferSchema = new Schema({
         type: String,
         required: false
     },
+    supportingDocument: {
+        type: String,
+        required: false
+    },
     offer: {
         type: Number,
         required: false
@@ -43,6 +47,9 @@ const OfferSchema = new Schema({
     },
     acceptedDate: {
         type: Date
+    },
+    sellerPurchaseAgreement: {
+        type: String
     }
 });
 
