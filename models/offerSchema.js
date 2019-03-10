@@ -50,6 +50,10 @@ const OfferSchema = new Schema({
     },
     sellerPurchaseAgreement: {
         type: String
+    },
+    buyerAcceptance: {
+        type: Boolean,
+        default: false
     }
 });
 
