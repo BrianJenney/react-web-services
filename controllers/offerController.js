@@ -160,6 +160,20 @@ module.exports = {
         }
     },
 
+    // BUYER ACCEPT OFFER
+    buyerAcceptOffer: async (req, res) => {
+        const { offerId } = req.body;
+
+        const offer = await db.Offer.findById(offerId);
+
+        offer.buyerAcceptance = true;
+
+        offer
+            .save()
+            .then(doc => res.json(doc))
+            .catch(err => res.json(err));
+    },
+
     // GET ALL OFFERS BELONGING TO A SELLER
     getOffers: async (req, res) => {
         const homes = await db.Property.find({

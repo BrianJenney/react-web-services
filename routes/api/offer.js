@@ -19,4 +19,6 @@ router.route("/acceptoffer").post(offerController.acceptOffer);
 
 router.route("/offer/:offer_id").get(offerController.offerInfo);
 
+router.route("acceptoffer/buyer").post(offerController.buyerAcceptOffer);
+
 module.exports = router;
