@@ -57,6 +57,10 @@ module.exports = {
             if (Object.keys(req.body).length === 0) {
                 return;
             }
+            const userId = new ObjectId(req.body.userId);
+
+            const propertyObj = Object.assign({}, req.body, { userId });
+
             db.Property.create(req.body)
                 .then(doc => res.json(doc))
                 .catch(err => res.json(err));
@@ -70,7 +74,7 @@ module.exports = {
             homeId,
             imgsToDelete,
             email,
-            userid,
+            userId,
             price,
             propertyType,
             description,
@@ -148,7 +152,7 @@ module.exports = {
     getListingsByUser: async (req, res) => {
         const user = await db.User.find({ email: req.params.email });
 
-        db.Property.find({ userid: user[0]._id })
+        db.Property.find({ userId: user[0]._id })
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
     },
@@ -191,13 +195,13 @@ module.exports = {
         }
 
         const query = isEmail
-            ? { userid: owner._id }
+            ? { userId: owner._id }
             : { _id: new ObjectId(req.params.id) };
 
         const doc = await db.Property.findOne(query);
 
         const monthly = doc ? getMortgage(doc.price) : 0;
-        const user = doc ? await getUserEmail(doc.userid) : [];
+        const user = doc ? await getUserEmail(doc.userId) : [];
 
         res.json({
             doc,

@@ -207,14 +207,11 @@ module.exports = {
 
     // GET OFFER INFO BY USER AND HOME
     getOffersByUserAndHome: async (req, res) => {
-        const homes = await db.Property.find({
-            userid: new ObjectId(req.body.userId)
-        });
-
         db.Offer.aggregate([
             {
                 $match: {
-                    homeId: new ObjectId(req.body.homeId)
+                    homeId: new ObjectId(req.body.homeId),
+                    userId: new ObjectId(req.body.userId)
                 }
             },
             {
@@ -231,7 +228,7 @@ module.exports = {
     },
 
     // GET OFFER INFO BY USER
-    getOffersByuser: (req, res) => {
+    getOffersByUser: (req, res) => {
         db.Offer.aggregate([
             {
                 $match: {
@@ -244,6 +241,17 @@ module.exports = {
                     localField: "homeId",
                     foreignField: "_id",
                     as: "home"
+                }
+            },
+            {
+                $unwind: "$home"
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "seller"
                 }
             }
         ])
