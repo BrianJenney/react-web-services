@@ -62,7 +62,7 @@ module.exports = {
             _id: new ObjectId(req.body.homeId)
         });
         const recipient = await db.User.findOne({
-            _id: new ObjectId(home.userid)
+            _id: new ObjectId(home.userd)
         });
         const sender = await db.User.findOne({
             _id: new ObjectId(req.body.userId)
@@ -143,7 +143,7 @@ module.exports = {
             );
 
             const sender = await db.User.find({
-                _id: new ObjectId(home.userid)
+                _id: new ObjectId(home.userId)
             });
 
             const mailer = new Mailer(
@@ -177,7 +177,7 @@ module.exports = {
     // GET ALL OFFERS BELONGING TO A SELLER
     getOffers: async (req, res) => {
         const homes = await db.Property.find({
-            userid: new ObjectId(req.body.userId)
+            userId: new ObjectId(req.body.userId)
         });
 
         const homeIds = homes.map(home => {
@@ -289,6 +289,8 @@ async function updateOffer(obj, res) {
         .catch(err => res.json(err));
 }
 
+//TODO: use the prod url when in a prod environment
+
 async function sendSellerSignedPurchaseAgreementMail(offer) {
     const recipient = await db.User.findOne({
         _id: new ObjectId(offer.userId)
@@ -299,7 +301,7 @@ async function sendSellerSignedPurchaseAgreementMail(offer) {
     });
 
     const sender = await db.User.find({
-        _id: new ObjectId(home.userid)
+        _id: new ObjectId(home.userId)
     });
 
     const mailer = new Mailer(

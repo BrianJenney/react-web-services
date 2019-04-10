@@ -159,10 +159,9 @@ module.exports = {
 
     // UPLOAD DOCUMENTS TO SELL PROPERTY
     uploadDocument: async (req, res) => {
+        const { documentType, userEmail } = req.body;
         let imgUrl;
-        const user = await db.User.findOne({ email: req.body.userEmail });
-
-        const { documentType } = req.body;
+        const user = await db.User.findOne({ email: userEmail });
 
         if (DOCUMENT_ENUM.includes(documentType)) {
             await cloudinary.uploader.upload(req.files.file.path, result => {
@@ -170,7 +169,7 @@ module.exports = {
             });
 
             db.Property.findOneAndUpdate(
-                { userid: user._id },
+                { userId: user._id },
                 {
                     $set: {
                         [documentType]: imgUrl
