@@ -4,15 +4,16 @@ const ObjectId = require("mongodb").ObjectID;
 module.exports = {
     //  upsert conversation
     post: (req, res) => {
+        const { to, from, text } = req.body;
         db.Messages.update(
-            { id: req.body.id },
+            { participants: [to, from] },
             {
-                $set: { participants: [req.body.to, req.body.from] },
+                $set: { participants: [to, from] },
                 $push: {
                     messages: {
-                        from: req.body.from,
-                        to: req.body.to,
-                        text: req.body.text,
+                        from: from,
+                        to: to,
+                        text: text,
                         viewed: false
                     }
                 }

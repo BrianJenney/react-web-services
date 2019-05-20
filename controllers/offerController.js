@@ -19,6 +19,8 @@ cloudinary.config({
         : require("../config.js").cloudinary_secret
 });
 
+const NECESSARY_DOCS = ["purchaseAgreement", "loanDocument"];
+
 module.exports = {
     //CREATE AN OFFER
     makeOffer: async (req, res) => {
@@ -103,7 +105,7 @@ module.exports = {
         }
     },
 
-    //ACCEPT OFFER
+    //SELLER ACCEPT OFFER
     acceptOffer: async (req, res) => {
         const offer = req.body;
 
@@ -274,6 +276,9 @@ module.exports = {
 };
 
 //private
+const _doesOfferHaveNeededDocs = offer => {
+    return NECESSARY_DOCS.every(doc => offer.includes(doc));
+};
 
 async function updateOffer(obj, res) {
     db.Offer.findOneAndUpdate(
