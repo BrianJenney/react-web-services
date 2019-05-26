@@ -164,9 +164,13 @@ module.exports = {
         const user = await db.User.findOne({ email: userEmail });
 
         if (DOCUMENT_ENUM.includes(documentType)) {
-            await cloudinary.uploader.upload(req.files.file.path, result => {
-                imgUrl = result.url;
-            });
+            await cloudinary.uploader.upload(
+                req.files.file.path,
+                { flags: `attachment:${documentType}` },
+                result => {
+                    imgUrl = result.url;
+                }
+            );
 
             db.Property.findOneAndUpdate(
                 { userId: user._id },
