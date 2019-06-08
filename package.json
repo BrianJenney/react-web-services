@@ -4,7 +4,7 @@
     "main": "server.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node server.js"
+        "start": "nodemon server.js"
     },
     "author": "",
     "license": "ISC",
@@ -17,7 +17,12 @@
         "cors": "^2.8.4",
         "eslint": "^4.14.0",
         "express": "^4.16.3",
+        "express-graphql": "^0.8.0",
+        "graphql": "^14.3.1",
+        "graphql-date": "^1.0.3",
+        "graphql-tools": "^4.0.4",
         "jsonwebtoken": "^8.1.0",
+        "merge-graphql-schemas": "^1.5.8",
         "moment": "^2.20.1",
         "momentjs": "^2.0.0",
         "mongodb": "^3.1.6",
