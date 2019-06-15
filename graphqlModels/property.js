@@ -86,8 +86,7 @@ const propertyQueryType = new graphql.GraphQLObjectType({
                     id: { type: graphql.GraphQLString }
                 },
                 resolve: function(_, args) {
-                    console.log(args);
-                    return db.Property.findOne({});
+                    return db.Property.findById(args.id);
                 }
             }
         };
