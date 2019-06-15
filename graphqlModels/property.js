@@ -6,6 +6,9 @@ const propertyType = new graphql.GraphQLObjectType({
     name: "property",
     fields: function() {
         return {
+            id: {
+                type: graphql.GraphQLID
+            },
             userId: {
                 type: graphql.GraphQLID
             },
@@ -75,6 +78,16 @@ const propertyQueryType = new graphql.GraphQLObjectType({
                 type: new graphql.GraphQLList(propertyType),
                 resolve: function() {
                     return db.Property.find({});
+                }
+            },
+            property: {
+                type: propertyType,
+                args: {
+                    id: { type: graphql.GraphQLString }
+                },
+                resolve: function(_, args) {
+                    console.log(args);
+                    return db.Property.findOne({});
                 }
             }
         };
