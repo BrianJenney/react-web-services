@@ -19,6 +19,8 @@ cloudinary.config({
         : require("../config.js").cloudinary_secret
 });
 
+const NECESSARY_DOCS = ["purchaseAgreement", "loanDocument"];
+
 module.exports = {
     //CREATE AN OFFER
     makeOffer: async (req, res) => {
@@ -62,7 +64,7 @@ module.exports = {
             _id: new ObjectId(req.body.homeId)
         });
         const recipient = await db.User.findOne({
-            _id: new ObjectId(home.userid)
+            _id: new ObjectId(home.userd)
         });
         const sender = await db.User.findOne({
             _id: new ObjectId(req.body.userId)
@@ -103,7 +105,7 @@ module.exports = {
         }
     },
 
-    //ACCEPT OFFER
+    //SELLER ACCEPT OFFER
     acceptOffer: async (req, res) => {
         const offer = req.body;
 
@@ -143,7 +145,7 @@ module.exports = {
             );
 
             const sender = await db.User.find({
-                _id: new ObjectId(home.userid)
+                _id: new ObjectId(home.userId)
             });
 
             const mailer = new Mailer(
@@ -177,7 +179,7 @@ module.exports = {
     // GET ALL OFFERS BELONGING TO A SELLER
     getOffers: async (req, res) => {
         const homes = await db.Property.find({
-            userid: new ObjectId(req.body.userId)
+            userId: new ObjectId(req.body.userId)
         });
 
         const homeIds = homes.map(home => {
@@ -207,14 +209,11 @@ module.exports = {
 
     // GET OFFER INFO BY USER AND HOME
     getOffersByUserAndHome: async (req, res) => {
-        const homes = await db.Property.find({
-            userid: new ObjectId(req.body.userId)
-        });
-
         db.Offer.aggregate([
             {
                 $match: {
-                    homeId: new ObjectId(req.body.homeId)
+                    homeId: new ObjectId(req.body.homeId),
+                    userId: new ObjectId(req.body.userId)
                 }
             },
             {
@@ -231,7 +230,7 @@ module.exports = {
     },
 
     // GET OFFER INFO BY USER
-    getOffersByuser: (req, res) => {
+    getOffersByUser: (req, res) => {
         db.Offer.aggregate([
             {
                 $match: {
@@ -244,6 +243,17 @@ module.exports = {
                     localField: "homeId",
                     foreignField: "_id",
                     as: "home"
+                }
+            },
+            {
+                $unwind: "$home"
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "seller"
                 }
             }
         ])
@@ -266,6 +276,9 @@ module.exports = {
 };
 
 //private
+const _doesOfferHaveNeededDocs = offer => {
+    return NECESSARY_DOCS.every(doc => offer.includes(doc));
+};
 
 async function updateOffer(obj, res) {
     db.Offer.findOneAndUpdate(
@@ -281,6 +294,8 @@ async function updateOffer(obj, res) {
         .catch(err => res.json(err));
 }
 
+//TODO: use the prod url when in a prod environment
+
 async function sendSellerSignedPurchaseAgreementMail(offer) {
     const recipient = await db.User.findOne({
         _id: new ObjectId(offer.userId)
@@ -291,7 +306,7 @@ async function sendSellerSignedPurchaseAgreementMail(offer) {
     });
 
     const sender = await db.User.find({
-        _id: new ObjectId(home.userid)
+        _id: new ObjectId(home.userId)
     });
 
     const mailer = new Mailer(

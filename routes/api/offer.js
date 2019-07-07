@@ -9,7 +9,7 @@ router.route("/makeoffer").post(multipartMiddleware, offerController.makeOffer);
 
 router.route("/offerinfo").post(offerController.getOffersByUserAndHome);
 
-router.route("/useroffers/:user_id").get(offerController.getOffersByuser);
+router.route("/buyeroffers/:user_id").get(offerController.getOffersByUser);
 
 router.route("/getoffers").post(offerController.getOffers);
 
@@ -18,7 +18,5 @@ router.route("/submitoffer").post(offerController.submitOffer);
 router.route("/acceptoffer").post(offerController.acceptOffer);
 
 router.route("/offer/:offer_id").get(offerController.offerInfo);
-
-router.route("acceptoffer/buyer").post(offerController.buyerAcceptOffer);
 
 module.exports = router;

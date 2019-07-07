@@ -57,6 +57,10 @@ module.exports = {
             if (Object.keys(req.body).length === 0) {
                 return;
             }
+            const userId = new ObjectId(req.body.userId);
+
+            const propertyObj = Object.assign({}, req.body, { userId });
+
             db.Property.create(req.body)
                 .then(doc => res.json(doc))
                 .catch(err => res.json(err));
@@ -70,7 +74,7 @@ module.exports = {
             homeId,
             imgsToDelete,
             email,
-            userid,
+            userId,
             price,
             propertyType,
             description,
@@ -148,25 +152,28 @@ module.exports = {
     getListingsByUser: async (req, res) => {
         const user = await db.User.find({ email: req.params.email });
 
-        db.Property.find({ userid: user[0]._id })
+        db.Property.find({ userId: user[0]._id })
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
     },
 
     // UPLOAD DOCUMENTS TO SELL PROPERTY
     uploadDocument: async (req, res) => {
+        const { documentType, userEmail } = req.body;
         let imgUrl;
-        const user = await db.User.findOne({ email: req.body.userEmail });
-
-        const { documentType } = req.body;
+        const user = await db.User.findOne({ email: userEmail });
 
         if (DOCUMENT_ENUM.includes(documentType)) {
-            await cloudinary.uploader.upload(req.files.file.path, result => {
-                imgUrl = result.url;
-            });
+            await cloudinary.uploader.upload(
+                req.files.file.path,
+                { flags: `attachment:${documentType}` },
+                result => {
+                    imgUrl = result.url;
+                }
+            );
 
             db.Property.findOneAndUpdate(
-                { userid: user._id },
+                { userId: user._id },
                 {
                     $set: {
                         [documentType]: imgUrl
@@ -191,13 +198,13 @@ module.exports = {
         }
 
         const query = isEmail
-            ? { userid: owner._id }
+            ? { userId: owner._id }
             : { _id: new ObjectId(req.params.id) };
 
         const doc = await db.Property.findOne(query);
 
         const monthly = doc ? getMortgage(doc.price) : 0;
-        const user = doc ? await getUserEmail(doc.userid) : [];
+        const user = doc ? await getUserEmail(doc.userId) : [];
 
         res.json({
             doc,

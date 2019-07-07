@@ -3,8 +3,8 @@ const moment = require("moment");
 const Schema = mongoose.Schema;
 
 const PropertySchema = new Schema({
-    userid: {
-        type: String,
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
         required: true
     },
     status: {
