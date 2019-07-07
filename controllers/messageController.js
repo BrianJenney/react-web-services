@@ -1,6 +1,5 @@
 const db = require("../models");
 const ObjectId = require("mongodb").ObjectID;
-const { io } = require("../server");
 
 //TODO:
 //socket on post -- push message to DB -- send a receive socket to the recipient
@@ -9,7 +8,7 @@ module.exports = {
     //  upsert conversation
     post: (req, res) => {
         const { to, from, text } = req.body;
-        db.Messages.update(
+        db.Messages.findOneAndUpdate(
             { participants: [to, from] },
             {
                 $set: { participants: [to, from] },
@@ -25,7 +24,8 @@ module.exports = {
             { upsert: true }
         )
             .then(doc => {
-                io.emit("newMessage", { doc });
+                console.log({ doc });
+                req.socket.emit("newMessage", { doc });
                 res.json(doc);
             })
             .catch(err => res.json(err));
