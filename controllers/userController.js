@@ -1,3 +1,5 @@
+import { ObjectID } from "../../../../Library/Caches/typescript/2.6/node_modules/@types/bson";
+
 const db = require("../models");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary").v2;
@@ -103,6 +105,34 @@ module.exports = {
                 $set: {
                     phoneNumber: req.body.phoneNumber,
                     userPic: imgUrl
+                }
+            },
+            { new: true }
+        )
+            .then(doc => res.json(doc))
+            .catch(err => res.json(err));
+    },
+
+    completeWizard: async (req, res) => {
+        const { userId } = req.body;
+        const hasFile = Object.keys(req.files).length;
+        let imgUrl;
+
+        const wizardBody = { userId, ...req.body };
+
+        if (hasFile) {
+            await cloudinary.uploader.upload(
+                req.files.file.path,
+                (err, result) => {
+                    imgUrl = result.url;
+                }
+            );
+        }
+        db.User.findOneAndUpdate(
+            { _id: ObjectId(userId) },
+            {
+                $set: {
+                    ...wizardBody
                 }
             },
             { new: true }

@@ -10,6 +10,10 @@ router.route("/register").post(multipartMiddleware, userController.register);
 router.route("/user/:id").get(userController.userInfo);
 
 router
+    .route("/wizard")
+    .post(multipartMiddleware, userController.completeWizard);
+
+router
     .route("/profile")
     .post(multipartMiddleware, userController.updateProfile);
 
