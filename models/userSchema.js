@@ -46,6 +46,14 @@ const UserSchema = new Schema({
     userCreated: {
         type: Date,
         default: Date.now
+    },
+    completedWizard: {
+        type: Boolean,
+        default: false
+    },
+    authorizeToRepresent: {
+        type: boolean,
+        default: false
     }
 });
 
