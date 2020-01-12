@@ -52,7 +52,7 @@ const UserSchema = new Schema({
         default: false
     },
     authorizeToRepresent: {
-        type: boolean,
+        type: Boolean,
         default: false
     },
     contractAgreement: {

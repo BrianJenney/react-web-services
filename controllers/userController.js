@@ -1,21 +1,14 @@
-import { ObjectID } from "../../../../Library/Caches/typescript/2.6/node_modules/@types/bson";
-
 const db = require("../models");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary").v2;
 const ObjectId = require("mongodb").ObjectID;
 
 cloudinary.config({
-    cloud_name: process.env.NODE_ENV
-        ? process.env.cloduinary_cloud
-        : require("../config.js").cloduinary_cloud,
-    api_key: process.env.NODE_ENV
-        ? process.env.cloudinary
-        : require("../config.js").cloudinary,
-    api_secret: process.env.NODE_ENV
-        ? process.env.cloudinary_secret
-        : require("../config.js").cloudinary_secret
+    cloud_name: process.env.cloduinary_cloud,
+    api_key: process.env.cloudinary,
+    api_secret: process.env.cloudinary_secret
 });
+require('dotenv').config();
 
 module.exports = {
     login: (req, res) => {

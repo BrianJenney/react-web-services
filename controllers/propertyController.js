@@ -2,21 +2,13 @@ const db = require("../models");
 const axios = require("axios");
 const cloudinary = require("cloudinary");
 const ObjectId = require("mongodb").ObjectID;
-const geoKey = process.env.NODE_ENV
-    ? process.env.geoapi
-    : require("../config.js").geoapi;
-
+const geoKey = process.env.geoapi
 cloudinary.config({
-    cloud_name: process.env.NODE_ENV
-        ? process.env.cloduinary_cloud
-        : require("../config.js").cloduinary_cloud,
-    api_key: process.env.NODE_ENV
-        ? process.env.cloudinary
-        : require("../config.js").cloudinary,
-    api_secret: process.env.NODE_ENV
-        ? process.env.cloudinary_secret
-        : require("../config.js").cloudinary_secret
+    cloud_name: process.env.cloduinary_cloud,
+    api_key: process.env.cloudinary,
+    api_secret: process.env.cloudinary_secret
 });
+require('dotenv').config();
 
 const DOCUMENT_ENUM = [
     "transferDisclosure",
@@ -315,8 +307,8 @@ getMortgage = price => {
 monthlyPayment = (principle, numberOfPayments, interest) => {
     return Math.round(
         principle *
-            interest *
-            Math.pow(1 + interest, numberOfPayments) /
-            (Math.pow(1 + interest, numberOfPayments) - 1)
+        interest *
+        Math.pow(1 + interest, numberOfPayments) /
+        (Math.pow(1 + interest, numberOfPayments) - 1)
     );
 };
