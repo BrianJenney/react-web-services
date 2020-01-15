@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const routes = require("./routes");
 const mongoose = require("mongoose");
 const socketIO = require("socket.io");
-const uri = process.env.mongo.mongo;
+const uri = process.env.mongo;
 const cors = require("cors");
 require('dotenv').config();
 
