@@ -46,8 +46,49 @@ const UserSchema = new Schema({
     userCreated: {
         type: Date,
         default: Date.now
+    },
+    completedWizard: {
+        type: Boolean,
+        default: false
+    },
+    authorizeToRepresent: {
+        type: Boolean,
+        default: false
+    },
+    contractAgreement: {
+        type: String
+    },
+    ownerType: {
+        type: String,
+        default: "owner",
+        enum: ["poa", "trustee", "conservator", "n/a", "owner"]
+    },
+    ownershipName: {
+        type: String
+    },
+    previousSellingMethod: {
+        type: String,
+        default: "n/a",
+        enum: ["n/a", "realtor", "attorney", "independent", "other"]
+    },
+    isRelativeAgent: {
+        type: Boolean,
+        default: false
+    },
+    idealTimeframe: {
+        type: String,
+        default: "asap",
+        enum: ["asap", "3mos", "6mos"]
     }
 });
+
+UserSchema.virtual.hasSoldHome = function() {
+    return this.previousSellingMethod !== "n/a";
+};
+
+UserSchema.virtual.isOwner = function() {
+    return this.ownerType === "owner";
+};
 
 // hash the password
 UserSchema.methods.generateHash = function(password) {

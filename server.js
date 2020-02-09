@@ -1,18 +1,22 @@
 const express = require("express");
+const http = require("http");
 const app = express();
 const bodyParser = require("body-parser");
 const routes = require("./routes");
 const mongoose = require("mongoose");
-const uri = process.env.NODE_ENV
-    ? process.env.mongo
-    : require("./config.js").mongo;
+const socketIO = require("socket.io");
+const uri = process.env.mongo;
 const cors = require("cors");
+require('dotenv').config();
+
+const server = http.createServer(app);
+const socket = socketIO(server);
 
 mongoose.connect(uri);
 
 app.use(cors());
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header(
         "Access-Control-Allow-Headers",
@@ -29,3 +33,15 @@ app.use(bodyParser.json());
 app.listen(process.env.PORT || 8081);
 
 app.use(routes);
+
+socket.on("connection", socket => {
+    console.log(`User on socket ${socket}`);
+});
+
+socket.on("disconnect", () => {
+    console.log("user disconnected");
+});
+
+module.exports = {
+    socket
+};

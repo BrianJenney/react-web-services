@@ -2,22 +2,16 @@ const db = require("../models");
 const axios = require("axios");
 const cloudinary = require("cloudinary").v2;
 const ObjectId = require("mongodb").ObjectID;
-const geoKey = process.env.NODE_ENV
-    ? process.env.geoapi
-    : require("../config.js").geoapi;
+const geoKey = process.env.geoapi;
 const Mailer = require("../mailer/mail");
-
 cloudinary.config({
-    cloud_name: process.env.NODE_ENV
-        ? process.env.cloduinary_cloud
-        : require("../config.js").cloduinary_cloud,
-    api_key: process.env.NODE_ENV
-        ? process.env.cloudinary
-        : require("../config.js").cloudinary,
-    api_secret: process.env.NODE_ENV
-        ? process.env.cloudinary_secret
-        : require("../config.js").cloudinary_secret
+    cloud_name: process.env.cloduinary_cloud,
+    api_key: process.env.cloudinary,
+    api_secret: process.env.cloudinary_secret
 });
+require('dotenv').config();
+
+const NECESSARY_DOCS = ["purchaseAgreement", "loanDocument"];
 
 module.exports = {
     //CREATE AN OFFER
@@ -62,7 +56,7 @@ module.exports = {
             _id: new ObjectId(req.body.homeId)
         });
         const recipient = await db.User.findOne({
-            _id: new ObjectId(home.userid)
+            _id: new ObjectId(home.userd)
         });
         const sender = await db.User.findOne({
             _id: new ObjectId(req.body.userId)
@@ -92,7 +86,7 @@ module.exports = {
                         sender.email,
                         "Offer",
                         `<p>You have an offer on from ${
-                            sender.email
+                        sender.email
                         } on your property.</p> 
                         <p>Visit your <a href='localhost:3000/dashboard'>dashboard</a> to review this offer.</p>`
                     );
@@ -103,7 +97,7 @@ module.exports = {
         }
     },
 
-    //ACCEPT OFFER
+    //SELLER ACCEPT OFFER
     acceptOffer: async (req, res) => {
         const offer = req.body;
 
@@ -143,7 +137,7 @@ module.exports = {
             );
 
             const sender = await db.User.find({
-                _id: new ObjectId(home.userid)
+                _id: new ObjectId(home.userId)
             });
 
             const mailer = new Mailer(
@@ -151,7 +145,7 @@ module.exports = {
                 sender.email,
                 "Offer Accepted",
                 `<p>Your offer on the property, ${
-                    home.address
+                home.address
                 } has been accepted!</p> 
                     <p>Visit TBD <a href='localhost:3000/dashboard'>dashboard</a> for the next steps.</p>`,
                 res
@@ -177,7 +171,7 @@ module.exports = {
     // GET ALL OFFERS BELONGING TO A SELLER
     getOffers: async (req, res) => {
         const homes = await db.Property.find({
-            userid: new ObjectId(req.body.userId)
+            userId: new ObjectId(req.body.userId)
         });
 
         const homeIds = homes.map(home => {
@@ -207,14 +201,11 @@ module.exports = {
 
     // GET OFFER INFO BY USER AND HOME
     getOffersByUserAndHome: async (req, res) => {
-        const homes = await db.Property.find({
-            userid: new ObjectId(req.body.userId)
-        });
-
         db.Offer.aggregate([
             {
                 $match: {
-                    homeId: new ObjectId(req.body.homeId)
+                    homeId: new ObjectId(req.body.homeId),
+                    userId: new ObjectId(req.body.userId)
                 }
             },
             {
@@ -231,7 +222,7 @@ module.exports = {
     },
 
     // GET OFFER INFO BY USER
-    getOffersByuser: (req, res) => {
+    getOffersByUser: (req, res) => {
         db.Offer.aggregate([
             {
                 $match: {
@@ -244,6 +235,17 @@ module.exports = {
                     localField: "homeId",
                     foreignField: "_id",
                     as: "home"
+                }
+            },
+            {
+                $unwind: "$home"
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "seller"
                 }
             }
         ])
@@ -266,6 +268,9 @@ module.exports = {
 };
 
 //private
+const _doesOfferHaveNeededDocs = offer => {
+    return NECESSARY_DOCS.every(doc => offer.includes(doc));
+};
 
 async function updateOffer(obj, res) {
     db.Offer.findOneAndUpdate(
@@ -281,6 +286,8 @@ async function updateOffer(obj, res) {
         .catch(err => res.json(err));
 }
 
+//TODO: use the prod url when in a prod environment
+
 async function sendSellerSignedPurchaseAgreementMail(offer) {
     const recipient = await db.User.findOne({
         _id: new ObjectId(offer.userId)
@@ -291,7 +298,7 @@ async function sendSellerSignedPurchaseAgreementMail(offer) {
     });
 
     const sender = await db.User.find({
-        _id: new ObjectId(home.userid)
+        _id: new ObjectId(home.userId)
     });
 
     const mailer = new Mailer(
@@ -299,10 +306,10 @@ async function sendSellerSignedPurchaseAgreementMail(offer) {
         sender.email,
         "Purchase Agreement Signed",
         `<p>The seller ${
-            sender.firstName
+        sender.firstName
         } has signed your purchase agreement!</p> 
         <p>Visit your <a href='localhost:3000/buyerdashboard/${
-            home._id
+        home._id
         }'>dashboard</a> for the next steps.</p>`
     );
     mailer.sendMail();

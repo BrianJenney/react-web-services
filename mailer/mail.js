@@ -1,10 +1,6 @@
 const nodemailer = require("nodemailer");
-const gmail_name = process.env.NODE_ENV
-    ? process.env.gmail_name
-    : require("../config.js").gmail_name;
-const gmail_pw = process.env.NODE_ENV
-    ? process.env.gmail_pw
-    : require("../config.js").gmail_pw;
+const gmail_name = process.env.gmail_name;
+const gmail_pw = process.env.gmail_pw;
 const ENV = process.env.NODE_ENV ? "PROD" : "DEV";
 const DEV_TEAM = "brianjenney83@gmail.com";
 
@@ -15,6 +11,8 @@ const transporter = nodemailer.createTransport({
         pass: gmail_pw
     }
 });
+require('dotenv').config();
+
 
 class Mailer {
     constructor(recipient, sender, subject, html) {

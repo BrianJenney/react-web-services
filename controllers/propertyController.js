@@ -2,21 +2,13 @@ const db = require("../models");
 const axios = require("axios");
 const cloudinary = require("cloudinary");
 const ObjectId = require("mongodb").ObjectID;
-const geoKey = process.env.NODE_ENV
-    ? process.env.geoapi
-    : require("../config.js").geoapi;
-
+const geoKey = process.env.geoapi
 cloudinary.config({
-    cloud_name: process.env.NODE_ENV
-        ? process.env.cloduinary_cloud
-        : require("../config.js").cloduinary_cloud,
-    api_key: process.env.NODE_ENV
-        ? process.env.cloudinary
-        : require("../config.js").cloudinary,
-    api_secret: process.env.NODE_ENV
-        ? process.env.cloudinary_secret
-        : require("../config.js").cloudinary_secret
+    cloud_name: process.env.cloduinary_cloud,
+    api_key: process.env.cloudinary,
+    api_secret: process.env.cloudinary_secret
 });
+require('dotenv').config();
 
 const DOCUMENT_ENUM = [
     "transferDisclosure",
@@ -57,6 +49,12 @@ module.exports = {
             if (Object.keys(req.body).length === 0) {
                 return;
             }
+            const userId = new ObjectId(req.body.userId);
+
+            const propertyObj = Object.assign({}, req.body, {
+                userId
+            });
+
             db.Property.create(req.body)
                 .then(doc => res.json(doc))
                 .catch(err => res.json(err));
@@ -70,7 +68,7 @@ module.exports = {
             homeId,
             imgsToDelete,
             email,
-            userid,
+            userId,
             price,
             propertyType,
             description,
@@ -81,7 +79,9 @@ module.exports = {
             sqFeet
         } = req.body;
 
-        const home = await db.Property.findOne({ _id: new ObjectId(homeId) });
+        const home = await db.Property.findOne({
+            _id: new ObjectId(homeId)
+        });
         const currentImages = home.imgs;
         const addressResponse = await getAddress(address);
 
@@ -95,9 +95,8 @@ module.exports = {
         const hasFile = Object.keys(req.files).length;
 
         if (hasFile) {
-            const files = req.files.file.isArray
-                ? req.files.file
-                : [req.files.file];
+            const files = req.files.file.isArray ?
+                req.files.file : [req.files.file];
             files.map(file => {
                 promises.push(
                     cloudinary.uploader.upload(file.path, result => {
@@ -108,16 +107,16 @@ module.exports = {
         }
 
         await Promise.all(promises).then(() => {
-            db.Property.findOneAndUpdate(
-                { _id: new ObjectId(homeId) },
-                {
+            db.Property.findOneAndUpdate({
+                    _id: new ObjectId(homeId)
+                }, {
                     $set: {
                         imgs: [...newImages, ...imgUrls],
                         location: [
                             addressResponse.data.results[0].geometry.location
-                                .lng,
+                            .lng,
                             addressResponse.data.results[0].geometry.location
-                                .lat
+                            .lat
                         ],
                         address,
                         price,
@@ -129,9 +128,9 @@ module.exports = {
                         sqFeetLot,
                         sqFeet
                     }
-                },
-                { new: true }
-            )
+                }, {
+                    new: true
+                })
                 .then(doc => res.json(doc))
                 .catch(err => res.json(err));
         });
@@ -146,38 +145,53 @@ module.exports = {
 
     //  LISTINGS BY USER
     getListingsByUser: async (req, res) => {
-        const user = await db.User.find({ email: req.params.email });
+        const user = await db.User.find({
+            email: req.params.email
+        });
 
-        db.Property.find({ userid: user[0]._id })
+        db.Property.find({
+                userId: user[0]._id
+            })
             .then(doc => res.json(doc))
             .catch(err => res.json(err));
     },
 
     // UPLOAD DOCUMENTS TO SELL PROPERTY
     uploadDocument: async (req, res) => {
+        const {
+            documentType,
+            userEmail
+        } = req.body;
         let imgUrl;
-        const user = await db.User.findOne({ email: req.body.userEmail });
-
-        const { documentType } = req.body;
+        const user = await db.User.findOne({
+            email: userEmail
+        });
 
         if (DOCUMENT_ENUM.includes(documentType)) {
-            await cloudinary.uploader.upload(req.files.file.path, result => {
-                imgUrl = result.url;
-            });
+            await cloudinary.uploader.upload(
+                req.files.file.path, {
+                    flags: `attachment:${documentType}`
+                },
+                result => {
+                    imgUrl = result.url;
+                }
+            );
 
-            db.Property.findOneAndUpdate(
-                { userid: user._id },
-                {
+            db.Property.findOneAndUpdate({
+                    userId: user._id
+                }, {
                     $set: {
                         [documentType]: imgUrl
                     }
-                },
-                { new: true }
-            )
+                }, {
+                    new: true
+                })
                 .then(doc => res.json(doc))
                 .catch(err => res.json(err));
         } else {
-            res.json({ error: "file type not supported" });
+            res.json({
+                error: "file type not supported"
+            });
         }
     },
 
@@ -187,17 +201,21 @@ module.exports = {
         const isEmail = req.params.id.includes("@");
 
         if (isEmail) {
-            owner = await db.User.findOne({ email: req.params.id });
+            owner = await db.User.findOne({
+                email: req.params.id
+            });
         }
 
-        const query = isEmail
-            ? { userid: owner._id }
-            : { _id: new ObjectId(req.params.id) };
+        const query = isEmail ? {
+            userId: owner._id
+        } : {
+            _id: new ObjectId(req.params.id)
+        };
 
         const doc = await db.Property.findOne(query);
 
         const monthly = doc ? getMortgage(doc.price) : 0;
-        const user = doc ? await getUserEmail(doc.userid) : [];
+        const user = doc ? await getUserEmail(doc.userId) : [];
 
         res.json({
             doc,
@@ -212,6 +230,10 @@ module.exports = {
         let lon, lat, andClauses, params;
 
         params = JSON.parse(JSON.stringify(req.body));
+
+        if (Number.isNaN(Number(params.maxPrice))) {
+            params.maxPrice = 0;
+        }
 
         andClauses = await buildQuery(params);
         let {
@@ -255,15 +277,26 @@ buildQuery = async params => {
             ];
         });
         andClauses.push({
-            location: { $near: [lon, lat], $maxDistance: 0.25 }
+            location: {
+                $near: [lon, lat],
+                $maxDistance: 0.25
+            }
         });
     }
     if (params.hasOwnProperty("bedRooms")) {
-        andClauses.push({ bedRooms: { $gte: params.bedRooms || 0 } });
+        andClauses.push({
+            bedRooms: {
+                $gte: params.bedRooms || 0
+            }
+        });
     }
 
     if (params.hasOwnProperty("bathRooms")) {
-        andClauses.push({ bathRooms: { $gte: params.bathRooms || 0 } });
+        andClauses.push({
+            bathRooms: {
+                $gte: params.bathRooms || 0
+            }
+        });
     }
 
     if (
@@ -280,7 +313,9 @@ buildQuery = async params => {
 
     if (params.hasOwnProperty("propertyType")) {
         if (params.propertyType !== null && params.propertyType.length) {
-            andClauses.push({ propertyType: params.propertyType });
+            andClauses.push({
+                propertyType: params.propertyType
+            });
         }
     }
 
@@ -294,7 +329,9 @@ getLonLat = address => {
 };
 
 getUserEmail = userId => {
-    return db.User.findOne({ _id: new ObjectId(userId) });
+    return db.User.findOne({
+        _id: new ObjectId(userId)
+    });
 };
 
 getMortgage = price => {
@@ -308,8 +345,8 @@ getMortgage = price => {
 monthlyPayment = (principle, numberOfPayments, interest) => {
     return Math.round(
         principle *
-            interest *
-            Math.pow(1 + interest, numberOfPayments) /
-            (Math.pow(1 + interest, numberOfPayments) - 1)
+        interest *
+        Math.pow(1 + interest, numberOfPayments) /
+        (Math.pow(1 + interest, numberOfPayments) - 1)
     );
 };
