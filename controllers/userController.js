@@ -1,162 +1,150 @@
-const db = require("../models");
-const jwt = require("jsonwebtoken");
-const cloudinary = require("cloudinary").v2;
-const ObjectId = require("mongodb").ObjectID;
+const db = require('../models');
+const jwt = require('jsonwebtoken');
+const cloudinary = require('cloudinary').v2;
+const ObjectId = require('mongodb').ObjectID;
 
 cloudinary.config({
-    cloud_name: process.env.cloduinary_cloud,
-    api_key: process.env.cloudinary,
-    api_secret: process.env.cloudinary_secret
+	cloud_name: process.env.cloduinary_cloud,
+	api_key: process.env.cloudinary,
+	api_secret: process.env.cloudinary_secret
 });
 require('dotenv').config();
 
 module.exports = {
-    login: (req, res) => {
-        db.User.findOne({ email: req.body.email }).then(user => {
-            if (user !== null) {
-                if (user.validPassword(req.body.password)) {
-                    sendJwt(user, res);
-                } else {
-                    res.json({
-                        errors: "invalid password",
-                        message: "Password or Username not found"
-                    });
-                }
-            } else {
-                res.json({
-                    errors: "invalid password",
-                    message: "Password or Username not found"
-                });
-            }
-        });
-    },
+	login: (req, res) => {
+		db.User.findOne({ email: req.body.email }).then((user) => {
+			if (user !== null) {
+				if (user.validPassword(req.body.password)) {
+					sendJwt(user, res);
+				} else {
+					res.json({
+						errors: 'invalid password',
+						message: 'Password or Username not found'
+					});
+				}
+			} else {
+				res.json({
+					errors: 'invalid password',
+					message: 'Password or Username not found'
+				});
+			}
+		});
+	},
 
-    userInfo: (req, res) => {
-        db.User.findOne({ _id: new ObjectId(req.params.id) })
-            .then(doc => res.json(doc))
-            .catch(err => res.json(err));
-    },
+	userInfo: (req, res) => {
+		db.User
+			.findOne({ _id: new ObjectId(req.params.id) })
+			.then((doc) => res.json(doc))
+			.catch((err) => res.json(err));
+	},
 
-    register: async (req, res) => {
-        const hasFile = Object.keys(req.files).length;
-        let imgUrl;
+	register: async (req, res) => {
+		const hasFile = Object.keys(req.files).length;
+		let imgUrl;
 
-        if (hasFile) {
-            await cloudinary.uploader.upload(
-                req.files.file.path,
-                (err, result) => {
-                    imgUrl = result.url;
-                }
-            );
-        }
-        const {
-            firstName,
-            lastName,
-            email,
-            phoneNumber,
-            password,
-            userType
-        } = req.body;
-        let newUser = db.User({
-            firstName,
-            lastName,
-            email,
-            phoneNumber,
-            password,
-            userPic: imgUrl
-        });
+		if (hasFile) {
+			await cloudinary.uploader.upload(req.files.file.path, (err, result) => {
+				imgUrl = result.url;
+			});
+		}
+		const { firstName, lastName, email, phoneNumber, password, userType } = req.body;
+		let newUser = db.User({
+			firstName,
+			lastName,
+			email,
+			phoneNumber,
+			password,
+			userPic: imgUrl
+		});
 
-        newUser.password = newUser.generateHash(password);
+		newUser.password = newUser.generateHash(password);
 
-        const errorObject = { success: false };
-        const successObject = { success: true };
+		const errorObject = { success: false };
+		const successObject = { success: true };
 
-        newUser
-            .save()
-            .then(user => {
-                sendJwt(user, res);
-            })
-            .catch(err => res.json(err));
-    },
+		newUser
+			.save()
+			.then((user) => {
+				sendJwt(user, res);
+			})
+			.catch((err) => res.json(err));
+	},
 
-    updateProfile: async (req, res) => {
-        const hasFile = Object.keys(req.files).length;
-        let imgUrl;
+	updateProfile: async (req, res) => {
+		const hasFile = Object.keys(req.files).length;
+		let imgUrl;
 
-        if (hasFile) {
-            await cloudinary.uploader.upload(
-                req.files.file.path,
-                (err, result) => {
-                    imgUrl = result.url;
-                }
-            );
-        }
+		if (hasFile) {
+			await cloudinary.uploader.upload(req.files.file.path, (err, result) => {
+				imgUrl = result.url;
+			});
+		}
 
-        db.User.findOneAndUpdate(
-            { email: req.body.userEmail },
-            {
-                $set: {
-                    phoneNumber: req.body.phoneNumber,
-                    userPic: imgUrl
-                }
-            },
-            { new: true }
-        )
-            .then(doc => res.json(doc))
-            .catch(err => res.json(err));
-    },
+		db.User
+			.findOneAndUpdate(
+				{ email: req.body.userEmail },
+				{
+					$set: {
+						phoneNumber: req.body.phoneNumber,
+						userPic: imgUrl
+					}
+				},
+				{ new: true }
+			)
+			.then((doc) => res.json(doc))
+			.catch((err) => res.json(err));
+	},
 
-    completeWizard: async (req, res) => {
-        const { userId } = req.body;
-        const hasFile = Object.keys(req.files).length;
-        let imgUrl;
+	completeWizard: async (req, res) => {
+		const { userId } = req.body;
+		const hasFile = Object.keys(req.files).length;
+		let imgUrl;
 
-        const wizardBody = { userId, ...req.body };
+		const wizardBody = { userId, ...req.body };
 
-        if (hasFile) {
-            await cloudinary.uploader.upload(
-                req.files.file.path,
-                (err, result) => {
-                    imgUrl = result.url;
-                }
-            );
-        }
-        db.User.findOneAndUpdate(
-            { _id: ObjectId(userId) },
-            {
-                $set: {
-                    ...wizardBody
-                }
-            },
-            { new: true }
-        )
-            .then(doc => res.json(doc))
-            .catch(err => res.json(err));
-    }
+		if (hasFile) {
+			await cloudinary.uploader.upload(req.files.file.path, (err, result) => {
+				imgUrl = result.url;
+			});
+		}
+		db.User
+			.findOneAndUpdate(
+				{ _id: ObjectId(userId) },
+				{
+					$set: {
+						...wizardBody,
+						completedWizard: true
+					}
+				},
+				{ new: true }
+			)
+			.then((doc) => res.json(doc))
+			.catch((err) => res.json(err));
+	}
 };
 
 //private
 
 sendJwt = (user, res) => {
-    let token = jwt.sign(
-        {
-            data: {
-                email: user.email,
-                password: user.password,
-                _id: user._id
-            }
-        },
-        "secret",
-        { expiresIn: "365 days" }
-    );
+	let token = jwt.sign(
+		{
+			data: {
+				email: user.email,
+				password: user.password,
+				_id: user._id
+			}
+		},
+		'secret',
+		{ expiresIn: '365 days' }
+	);
 
-    const userInfo = {
-        email: user.email,
-        userType: user.userType,
-        _id: user._id,
-        profilePic: user.profilePic,
-        phone: user.phoneNumber
-    };
+	const userInfo = {
+		email: user.email,
+		userType: user.userType,
+		_id: user._id,
+		profilePic: user.profilePic,
+		phone: user.phoneNumber
+	};
 
-    res.json({ userInfo, token: token });
+	res.json({ userInfo, token: token });
 };
