@@ -146,5 +146,5 @@ module.exports = {
 	userInfo,
 	register,
 	updateProfile,
-	completedWizard
+	completeWizard
 };
