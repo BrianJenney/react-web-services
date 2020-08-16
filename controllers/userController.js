@@ -91,11 +91,11 @@ const updateProfile = async (req, res) => {
 };
 
 const completeWizard = async (req, res) => {
-	const { userId } = req.body;
+	const { userId, wizardType } = req.body;
 	const hasFile = Object.keys(req.files).length;
 	let imgUrl;
 
-	const wizardBody = { userId, ...req.body };
+	const wizardBody = { userId, wizardType, ...req.body };
 
 	if (hasFile) {
 		await cloudinary.uploader.upload(req.files.file.path, (err, result) => {
@@ -108,7 +108,7 @@ const completeWizard = async (req, res) => {
 			{
 				$set: {
 					...wizardBody,
-					completedWizard: true
+					[wizardType]: true
 				}
 			},
 			{ new: true }
