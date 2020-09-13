@@ -1,6 +1,5 @@
 const express = require('express');
 const http = require('http');
-const app = express();
 const bodyParser = require('body-parser');
 const routes = require('./routes');
 const mongoose = require('mongoose');
@@ -14,6 +13,7 @@ const socket = socketIO(server);
 
 mongoose.connect(uri);
 
+const app = express();
 app.use(cors());
 
 app.use((req, res, next) => {
