@@ -8,13 +8,12 @@ const uri = process.env.mongo;
 const cors = require('cors');
 require('dotenv').config();
 
+const app = express();
+app.use(cors());
 const server = http.createServer(app);
 const socket = socketIO(server);
 
 mongoose.connect(uri);
-
-const app = express();
-app.use(cors());
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
