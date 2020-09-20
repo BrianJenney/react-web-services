@@ -51,7 +51,7 @@ const register = async (req, res) => {
         email,
         phoneNumber,
         password,
-        userType,
+        userType = 'buyer',
     } = req.body;
     let newUser = db.User({
         firstName,
@@ -59,13 +59,11 @@ const register = async (req, res) => {
         email,
         phoneNumber,
         password,
+        userType,
         userPic: imgUrl,
     });
 
     newUser.password = newUser.generateHash(password);
-
-    const errorObject = { success: false };
-    const successObject = { success: true };
 
     newUser
         .save()
@@ -75,21 +73,30 @@ const register = async (req, res) => {
         .catch((err) => res.json(err));
 };
 const updateProfile = async (req, res) => {
-    const hasFile = Object.keys(req.files).length;
-    let imgUrl;
+    const { body, files = {} } = req;
+    const hasFile = Object.keys(files).length;
+
+    const userProps = ['phoneNumber', 'email', 'userType'];
+    const updateObj = Object.keys(body).reduce((acc, curKey) => {
+        if (body[curKey] && userProps.includes(curKey)) {
+            acc[curKey] = body[curKey];
+        }
+        return acc;
+    }, {});
 
     if (hasFile) {
         await cloudinary.uploader.upload(req.files.file.path, (err, result) => {
-            imgUrl = result.url;
+            updateObj.userPic = result.url;
         });
     }
 
+    console.log(updateObj);
+
     db.User.findOneAndUpdate(
-        { email: req.body.userEmail },
+        { _id: new ObjectId(body.id) },
         {
             $set: {
-                phoneNumber: req.body.phoneNumber,
-                userPic: imgUrl,
+                ...updateObj,
             },
         },
         { new: true }
@@ -100,7 +107,8 @@ const updateProfile = async (req, res) => {
 
 const completeWizard = async (req, res) => {
     const { userId, wizardType } = req.body;
-    const hasFile = Object.keys(req.files).length;
+    const { files = {} } = req;
+    const hasFile = Object.keys(files).length;
     let imgUrl;
 
     const completionMap = {
@@ -144,13 +152,7 @@ _sendJwt = (user, res) => {
         { expiresIn: '365 days' }
     );
 
-    const userInfo = {
-        email: user.email,
-        userType: user.userType,
-        _id: user._id,
-        profilePic: user.profilePic,
-        phone: user.phoneNumber,
-    };
+    const userInfo = user;
 
     res.json({ userInfo, token: token });
 };
