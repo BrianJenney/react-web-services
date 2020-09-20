@@ -33,14 +33,6 @@ app.listen(process.env.PORT || 8081);
 
 app.use(routes);
 
-socket.on('connection', (socket) => {
-    console.log(`User on socket ${socket}`);
-});
-
-socket.on('disconnect', () => {
-    console.log('user disconnected');
-});
-
 module.exports = {
     socket,
 };
