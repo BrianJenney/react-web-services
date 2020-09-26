@@ -1,20 +1,20 @@
-const router = require("express").Router();
-const userController = require("../../controllers/userController");
-const multipart = require("connect-multiparty");
+const router = require('express').Router();
+const userController = require('../../controllers/userController');
+const multipart = require('connect-multiparty');
 const multipartMiddleware = multipart();
 
-router.route("/login").post(userController.login);
+router.route('/login').post(userController.login);
 
-router.route("/register").post(multipartMiddleware, userController.register);
+router.route('/register').post(multipartMiddleware, userController.register);
 
-router.route("/user/:id").get(userController.userInfo);
+router.route('/user/:id').get(userController.userInfo);
 
 router
-    .route("/wizard")
+    .route('/wizard')
     .post(multipartMiddleware, userController.completeWizard);
 
 router
-    .route("/profile")
+    .route('/profile')
     .post(multipartMiddleware, userController.updateProfile);
 
 module.exports = router;
