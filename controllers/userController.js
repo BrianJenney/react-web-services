@@ -53,6 +53,7 @@ const register = async (req, res) => {
         password,
         userType = 'buyer',
     } = req.body;
+
     let newUser = db.User({
         firstName,
         lastName,
@@ -89,8 +90,6 @@ const updateProfile = async (req, res) => {
             updateObj.userPic = result.url;
         });
     }
-
-    console.log(updateObj);
 
     db.User.findOneAndUpdate(
         { _id: new ObjectId(body.id) },
