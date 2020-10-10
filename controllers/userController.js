@@ -73,11 +73,12 @@ const register = async (req, res) => {
         })
         .catch((err) => res.json(err));
 };
+
 const updateProfile = async (req, res) => {
     const { body, files = {} } = req;
     const hasFile = Object.keys(files).length;
 
-    const userProps = ['phoneNumber', 'email', 'userType'];
+    const userProps = ['phoneNumber', 'email', 'userType', 'customerType'];
     const updateObj = Object.keys(body).reduce((acc, curKey) => {
         if (body[curKey] && userProps.includes(curKey)) {
             acc[curKey] = body[curKey];
@@ -108,7 +109,6 @@ const completeWizard = async (req, res) => {
     const { userId, wizardType } = req.body;
     const { files = {} } = req;
     const hasFile = Object.keys(files).length;
-    let imgUrl;
 
     const completionMap = {
         seller: 'sellerWizardCompleted',

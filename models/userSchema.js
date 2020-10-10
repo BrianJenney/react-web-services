@@ -81,7 +81,7 @@ const UserSchema = new Schema({
     },
     customerType: {
         type: String,
-        default: '',
+        default: 'premium',
         enum: ['fullserv', 'limited', 'premium'],
     },
     idealTimeframe: {
