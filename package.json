@@ -34,7 +34,7 @@
         "eslint-plugin-promise": "^3.6.0",
         "eslint-plugin-standard": "^3.0.1",
         "extend": ">=3.0.2",
-        "lodash": ">=4.17.11",
+        "lodash": ">=4.17.21",
         "mocha": "^4.1.0",
         "mpath": ">=0.5.1",
         "prettier": "^1.12.1",
