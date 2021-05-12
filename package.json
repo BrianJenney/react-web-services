@@ -22,7 +22,7 @@
         "momentjs": "^2.0.0",
         "mongodb": "^3.1.6",
         "mongoose": "^4.13.5",
-        "nodemailer": "^4.6.8",
+        "nodemailer": "^6.4.16",
         "socket.io": "^2.2.0"
     },
     "devDependencies": {
