@@ -17,7 +17,7 @@
         "cors": "^2.8.4",
         "eslint": "^4.14.0",
         "express": "^4.16.3",
-        "jsonwebtoken": "^8.1.0",
+        "jsonwebtoken": "^9.0.0",
         "moment": "^2.20.1",
         "momentjs": "^2.0.0",
         "mongodb": "^3.1.6",
